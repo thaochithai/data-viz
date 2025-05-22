@@ -30,7 +30,7 @@
         .header {
             background: url('header/heading_2.png') no-repeat center center;
             background-size: cover;
-            padding: 2rem 1rem;
+            
             text-align: left;
             position: relative;
             overflow: hidden;
@@ -407,11 +407,11 @@
     </div>
     
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('europe-map-tab')">Europe Map</button>
-            <button class="nav-tab" onclick="showTab('operators-by-country')">Operators by Country</button>
-            <button class="nav-tab" onclick="showTab('refund-policies')">Refund & Cancellation</button>
-            <button class="nav-tab" onclick="showTab('superstar-operators')">Top 5 Superstar Operators</button>
-            <button class="nav-tab" onclick="showTab('route-comparison')">Route Comparison</button>
+            <button class="nav-tab active" onclick="showTab('europe-map-tab', event)">Europe Map</button>
+            <button class="nav-tab" onclick="showTab('operators-by-country', event)">Operators by Country</button>
+            <button class="nav-tab" onclick="showTab('refund-policies', event)">Refund & Cancellation</button>
+            <button class="nav-tab" onclick="showTab('superstar-operators', event)">Top 5 Superstar Operators</button>
+            <button class="nav-tab" onclick="showTab('route-comparison', event)">Route Comparison</button>
         </div>
 
         <div id="europe-map-tab" class="tab-content active">
@@ -470,10 +470,42 @@
         </div>
 
         <div id="operators-by-country" class="tab-content">
-            <div class="chart-container">
-                <h2 class="chart-title">Number of Train Operators by Country</h2>
-                <div id="operators-by-country-chart"></div>
-            </div>
+
+<div class="chart-container">
+    <h2 class="chart-title">Punctuality vs Delay Across Operators</h2>
+    <div id="punctuality-delay-chart"></div>
+</div>
+
+<div class="chart-container">
+    <h2 class="chart-title">Booking Window Comparison</h2>
+    <div id="booking-window-chart"></div>
+</div>
+
+<div class="chart-container">
+    <h2 class="chart-title">Average Speed by Operator</h2>
+    <div id="average-speed-chart"></div>
+</div>
+
+<div class="chart-container">
+    <h2 class="chart-title">Service Amenities Matrix</h2>
+    <div id="service-amenities-chart"></div>
+</div>
+
+<div class="chart-container">
+    <h2 class="chart-title">Refund and Modification Policies</h2>
+    <div id="refund-modification-chart"></div>
+</div>
+
+<div class="chart-container">
+    <h2 class="chart-title">Night Train Availability</h2>
+    <div id="night-train-chart"></div>
+</div>
+
+<div class="chart-container">
+    <h2 class="chart-title">Accessibility and Discount Support</h2>
+    <div id="accessibility-support-chart"></div>
+</div>
+
             
             <div class="stat-grid">
                 <div class="stat-card">
@@ -627,7 +659,7 @@
         }
 
         // Show/hide tabs
-        function showTab(tabName) {
+        function showTab(tabName, event) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -778,12 +810,12 @@
             }
             
             // Check if we have a percentage string
-            if (countryInfo['% electried length'] && typeof countryInfo['% electried length'] === 'string') {
-                return parseInt(countryInfo['% electried length'].replace('%', ''));
+            if (countryInfo['% electrified length'] && typeof countryInfo['% electrified length'] === 'string') {
+                return parseInt(countryInfo['% electrified length'].replace('%', ''));
             }
             
             // Calculate from lengths
-            const electrified = countryInfo.eletrified_rail_length || 0;
+            const electrified = countryInfo.electrified_rail_length || 0;
             const total = countryInfo.total_length || 0;
             
             if (total === 0) return 0;
@@ -796,7 +828,7 @@
             
             document.getElementById('selected-country-name').textContent = countryInfo.country;
             document.getElementById('selected-total-length').textContent = (countryInfo.total_length || 0).toLocaleString();
-            document.getElementById('selected-electrified-length').textContent = (countryInfo.eletrified_rail_length || 0).toLocaleString();
+            document.getElementById('selected-electrified-length').textContent = (countryInfo.electrified_rail_length || 0).toLocaleString();
             document.getElementById('selected-electrified-percent').textContent = calculateElectrifiedPercent(countryInfo) + '%';
             document.getElementById('selected-passengers').textContent = (countryInfo.MIO_PKM || 0).toLocaleString();
         }
@@ -1169,8 +1201,8 @@
             );
 
             // Calculate averages
-            const intercityAvgPrice = d3.mean(intercityRoutes, d => parseFloat(d[' price_eur ']) / d.distance_km) || 0;
-            const internationalAvgPrice = d3.mean(internationalRoutes, d => parseFloat(d[' price_eur ']) / d.distance_km) || 0;
+            const intercityAvgPrice = d3.mean(intercityRoutes, d => parseFloat(d['price_eur']) / d.distance_km) || 0;
+            const internationalAvgPrice = d3.mean(internationalRoutes, d => parseFloat(d['price_eur']) / d.distance_km) || 0;
             const intercityAvgSpeed = d3.mean(intercityRoutes, d => d.speed_km_per_hour) || 0;
             const internationalAvgSpeed = d3.mean(internationalRoutes, d => d.speed_km_per_hour) || 0;
 
@@ -1190,7 +1222,7 @@
             const sortedRoutes = allData.routes
                 .map(route => ({
                     ...route,
-                    pricePerKm: parseFloat(route[' price_eur ']) / route.distance_km
+                    pricePerKm: parseFloat(route['price_eur']) / route.distance_km
                 }))
                 .sort((a, b) => a.pricePerKm - b.pricePerKm);
             
@@ -1201,7 +1233,7 @@
                     <td>${route.operator}</td>
                     <td>${route.intercity_or_international}</td>
                     <td>${route.distance_km}</td>
-                    <td>€${parseFloat(route[' price_eur ']).toFixed(2)}</td>
+                    <td>€${parseFloat(route['price_eur']).toFixed(2)}</td>
                     <td>€${route.pricePerKm.toFixed(3)}</td>
                     <td>${route.speed_km_per_hour}</td>
                 `;
