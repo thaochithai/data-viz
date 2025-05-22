@@ -81,28 +81,33 @@ function processOverviewData() {
     // Calculate key statistics
     updateOverviewStats();
     
-    // Create charts
-    createLengthByCountryChart();
-    createElectrificationChart();
-    createPassengerVolumeChart();
-    createNetworkDensityChart();
+    // Create the new charts
+    createTop5CountriesChart();
+    updateOperatorsList();
+    
+    // Initialize interactive map (placeholder for now)
+    initializeInteractiveMap();
 }
 
 // Update overview statistics cards
 function updateOverviewStats() {
     try {
-        // Calculate total countries
-        const totalCountries = countryData.length;
-        document.getElementById('total-countries').textContent = totalCountries;
-        
-        // Calculate total railway length (assuming column exists)
+        // Calculate total railway length
         const totalLength = countryData.reduce((sum, row) => {
-            const length = parseFloat(row.total_train_length) || 0;
-            return sum + length;
+            const electrified = parseFloat(row.electrified_train_length) || 0;
+            const nonElectrified = parseFloat(row.non_electrified_train_length) || 0;
+            return sum + electrified + nonElectrified;
         }, 0);
-        document.getElementById('total-length').textContent = totalLength.toLocaleString();
+        document.getElementById('total-length').textContent = Math.round(totalLength).toLocaleString() + ' km';
         
-        // Calculate electrification percentage
+        // Calculate total passenger-km
+        const totalPassengerKm = countryData.reduce((sum, row) => {
+            const pkm = parseFloat(row.MIO_PKM) || 0;
+            return sum + pkm;
+        }, 0);
+        document.getElementById('total-passenger-km').textContent = Math.round(totalPassengerKm).toLocaleString() + ' M';
+        
+        // Calculate electrification percentage (electrified / (electrified + non_electrified))
         const totalElectrified = countryData.reduce((sum, row) => {
             const electrified = parseFloat(row.electrified_train_length) || 0;
             return sum + electrified;
@@ -110,43 +115,51 @@ function updateOverviewStats() {
         const electrificationPercentage = totalLength > 0 ? Math.round((totalElectrified / totalLength) * 100) : 0;
         document.getElementById('electrified-percentage').textContent = electrificationPercentage + '%';
         
-        // Calculate total passenger-km
-        const totalPassengerKm = countryData.reduce((sum, row) => {
-            const pkm = parseFloat(row.MIO_PKM) || 0;
-            return sum + pkm;
-        }, 0);
-        document.getElementById('total-passenger-km').textContent = Math.round(totalPassengerKm).toLocaleString();
+        // Count total unique operators
+        const uniqueOperators = new Set(operatorsData.map(row => row.Operator)).size;
+        document.getElementById('total-operators').textContent = uniqueOperators;
         
-        console.log('Overview stats updated');
+        console.log('Overview stats updated with new calculations');
     } catch (error) {
         console.error('Error updating overview stats:', error);
     }
 }
 
-// Create Railway Length by Country Chart
-function createLengthByCountryChart() {
+// Create Top 5 Countries Chart (New Design)
+function createTop5CountriesChart() {
     try {
-        const ctx = document.getElementById('lengthByCountryChart').getContext('2d');
+        const ctx = document.getElementById('top5CountriesChart').getContext('2d');
         
-        // Get top 10 countries by railway length
-        const sortedData = countryData
-            .map(row => ({
-                country: row.Country,
-                length: parseFloat(row.total_train_length) || 0
-            }))
-            .filter(d => d.length > 0)
-            .sort((a, b) => b.length - a.length)
-            .slice(0, 10);
+        // Calculate combined metric: passenger volume for top 5 countries
+        const countryMetrics = countryData
+            .map(row => {
+                const passengerKm = parseFloat(row.MIO_PKM) || 0;
+                const electrified = parseFloat(row.electrified_train_length) || 0;
+                const nonElectrified = parseFloat(row.non_electrified_train_length) || 0;
+                const totalLength = electrified + nonElectrified;
+                
+                return {
+                    country: row.Country,
+                    passengerKm: passengerKm,
+                    totalLength: totalLength,
+                    code: row.Code
+                };
+            })
+            .filter(d => d.passengerKm > 0)
+            .sort((a, b) => b.passengerKm - a.passengerKm)
+            .slice(0, 5);
+        
+        // Store top 5 countries globally for operators list
+        window.top5Countries = countryMetrics;
         
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: sortedData.map(d => d.country),
+                labels: countryMetrics.map(d => d.country),
                 datasets: [{
-                    label: 'Railway Length (km)',
-                    data: sortedData.map(d => d.length),
-                    backgroundColor: '#4A7C59',
-                    borderColor: '#2D5A27',
+                    data: countryMetrics.map(d => d.passengerKm),
+                    backgroundColor: '#bbebd3',
+                    borderColor: '#bbebd3',
                     borderWidth: 1
                 }]
             },
@@ -160,25 +173,104 @@ function createLengthByCountryChart() {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Length (km)'
+                        ticks: {
+                            color: 'white'
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.2)'
                         }
                     },
                     x: {
-                        title: {
-                            display: true,
-                            text: 'Country'
+                        ticks: {
+                            color: 'white'
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.2)'
                         }
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const country = countryMetrics[index];
+                        updateOperatorsListForCountry(country.country);
                     }
                 }
             }
         });
         
-        console.log('Railway length chart created');
+        console.log('Top 5 countries chart created');
     } catch (error) {
-        console.error('Error creating railway length chart:', error);
+        console.error('Error creating top 5 countries chart:', error);
     }
+}
+
+// Update operators list based on selected country
+function updateOperatorsList() {
+    try {
+        const operatorsList = document.getElementById('operators-by-country');
+        
+        // Get operators from top 5 countries
+        if (window.top5Countries && window.top5Countries.length > 0) {
+            const topCountries = window.top5Countries.map(c => c.country);
+            
+            // Find operators that operate in these countries
+            const relevantOperators = operatorsData
+                .filter(row => topCountries.includes(row.Operate_in_country))
+                .map(row => row.Operator)
+                .filter((operator, index, self) => self.indexOf(operator) === index) // unique operators
+                .slice(0, 6); // limit to 6 operators
+            
+            operatorsList.innerHTML = relevantOperators
+                .map(operator => `<li>${operator}</li>`)
+                .join('');
+        } else {
+            // Default operators list
+            const defaultOperators = operatorsData
+                .map(row => row.Operator)
+                .filter((operator, index, self) => self.indexOf(operator) === index)
+                .slice(0, 6);
+            
+            operatorsList.innerHTML = defaultOperators
+                .map(operator => `<li>${operator}</li>`)
+                .join('');
+        }
+        
+        console.log('Operators list updated');
+    } catch (error) {
+        console.error('Error updating operators list:', error);
+    }
+}
+
+// Update operators list for specific country (when chart is clicked)
+function updateOperatorsListForCountry(countryName) {
+    try {
+        const operatorsList = document.getElementById('operators-by-country');
+        
+        // Find operators for this specific country
+        const countryOperators = operatorsData
+            .filter(row => row.Operate_in_country === countryName)
+            .map(row => row.Operator)
+            .filter((operator, index, self) => self.indexOf(operator) === index)
+            .slice(0, 8);
+        
+        if (countryOperators.length > 0) {
+            operatorsList.innerHTML = countryOperators
+                .map(operator => `<li>${operator}</li>`)
+                .join('');
+        }
+        
+        console.log(`Updated operators list for ${countryName}`);
+    } catch (error) {
+        console.error('Error updating operators list for country:', error);
+    }
+}
+
+// Initialize interactive map (placeholder)
+function initializeInteractiveMap() {
+    console.log('Interactive map placeholder - will implement with D3.js or Leaflet');
+    // TODO: Implement interactive European map showing railway data by country
+    // This would use D3.js with TopoJSON or SVG map data
 }
 
 // Create Electrification Status Chart
