@@ -467,9 +467,7 @@
                     </div>
                 </div>
             </div>
-        <div class="chart-container">
-                <h2 class="chart-title">Detailed Operators by Country</h2>
-                <div id="country-operators-detail"></div>
+        </div>
 
         <div id="operators-by-country" class="tab-content">
 
@@ -528,7 +526,9 @@
                 </div>
             </div>
 
-            
+            <div class="chart-container">
+                <h2 class="chart-title">Detailed Operators by Country</h2>
+                <div id="country-operators-detail"></div>
             </div>
         </div>
 
@@ -684,7 +684,6 @@
                 createRefundPolicyAnalysis();
                 createSuperstarOperators();
                 createRouteComparison();
-    createOperatorInsights();
             }
         }
 
@@ -752,7 +751,7 @@
                                 <strong>${countryInfo.country}</strong><br/>
                                 Passengers: ${(countryInfo.MIO_PKM || 0).toLocaleString()} M<br/>
                                 Length: ${(countryInfo.total_length || 0).toLocaleString()} km<br/>
-                                % Electrified: ${calculateElectrifiedPercent(countryInfo)}%
+                                % Electrified: ${parseFloat((countryInfo['% electrified length'] || '0').replace('%',''))}%
                             `)
                             .style('left', (event.pageX + 10) + 'px')
                             .style('top', (event.pageY - 28) + 'px');
@@ -805,7 +804,7 @@
             return country;
         }
 
-        function calculateElectrifiedPercent(countryInfo) {
+        function parseFloat((countryInfo['% electrified length'] || '0').replace('%','')) {
             if (!countryInfo || !countryInfo.total_length || countryInfo.total_length === 0) {
                 return 0;
             }
@@ -830,7 +829,7 @@
             document.getElementById('selected-country-name').textContent = countryInfo.country;
             document.getElementById('selected-total-length').textContent = (countryInfo.total_length || 0).toLocaleString();
             document.getElementById('selected-electrified-length').textContent = (countryInfo.electrified_rail_length || 0).toLocaleString();
-            document.getElementById('selected-electrified-percent').textContent = calculateElectrifiedPercent(countryInfo) + '%';
+            document.getElementById('selected-electrified-percent').textContent = parseFloat((countryInfo['% electrified length'] || '0').replace('%','')) + '%';
             document.getElementById('selected-passengers').textContent = (countryInfo.MIO_PKM || 0).toLocaleString();
         }
 
@@ -854,13 +853,10 @@
             // Calculate totals and averages
             const totalCountries = allData.countries.length;
             const totalLength = allData.countries.reduce((sum, d) => sum + (d.total_length || 0), 0);
-            const avgElectrification = allData.countries.reduce((sum, d) => sum + calculateElectrifiedPercent(d), 0) / totalCountries;
+            const avgElectrification = d3.mean(allData.countries, d => parseFloat((d['% electrified length'] || '0').replace('%', '')));
             
             // Find most electrified country
-            const mostElectrified = allData.countries.reduce((max, d) => {
-                const percent = calculateElectrifiedPercent(d);
-                return percent > calculateElectrifiedPercent(max) ? d : max;
-            }, allData.countries[0]);
+            const mostElectrified = allData.countries.reduce((max, d) => parseFloat((d['% electrified length'] || '0').replace('%','')) > parseFloat((max['% electrified length'] || '0').replace('%','')) ? d : max, allData.countries[0]);
 
             // Update statistics
             document.getElementById('map-total-countries').textContent = totalCountries;
@@ -1246,132 +1242,18 @@
     </script>
 
 <script>
-function createOperatorInsights() {
-    // Chart 1: Punctuality vs Delay
-    const punctualityData = allData.trainOperators.map(d => ({
-        operator: d.operator,
-        delay: +d.delay_above_min,
-        onTime: parseFloat((d.on_time_percentage || "0").replace('%', ''))
-    })).filter(d => !isNaN(d.delay) && !isNaN(d.onTime));
+function showTab(tabName, event) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
 
-    const pdSvg = d3.select('#punctuality-delay-chart').append('svg')
-        .attr('width', '100%').attr('height', 400).attr('viewBox', '0 0 800 400');
-    const pdMargin = {top: 40, right: 40, bottom: 60, left: 60};
-    const pdWidth = 800 - pdMargin.left - pdMargin.right;
-    const pdHeight = 400 - pdMargin.top - pdMargin.bottom;
-    const pdG = pdSvg.append('g').attr('transform', `translate(${pdMargin.left},${pdMargin.top})`);
-
-    const xPD = d3.scaleLinear().domain(d3.extent(punctualityData, d => d.delay)).range([0, pdWidth]);
-    const yPD = d3.scaleLinear().domain([0, 100]).range([pdHeight, 0]);
-
-    pdG.append('g').attr('transform', `translate(0,${pdHeight})`).call(d3.axisBottom(xPD).ticks(5));
-    pdG.append('g').call(d3.axisLeft(yPD));
-
-    pdG.selectAll('circle')
-        .data(punctualityData)
-        .enter().append('circle')
-        .attr('cx', d => xPD(d.delay))
-        .attr('cy', d => yPD(d.onTime))
-        .attr('r', 5)
-        .attr('fill', '#237644')
-        .attr('stroke', 'white')
-        .append('title')
-    // Chart 2: Booking Window Comparison
-    const bookingData = allData.trainOperators.map(d => ({
-        operator: d.operator,
-        months: +d.can_book_before_month
-    })).filter(d => !isNaN(d.months));
-    const bookingSvg = d3.select('#booking-window-chart').append('svg')
-        .attr('width', '100%').attr('height', 400).attr('viewBox', '0 0 800 400');
-    const bG = bookingSvg.append('g').attr('transform', 'translate(60,40)');
-    const bx = d3.scaleBand().domain(bookingData.map(d => d.operator)).range([0, 680]).padding(0.2);
-    const by = d3.scaleLinear().domain([0, d3.max(bookingData, d => d.months)]).range([300, 0]);
-    bG.append('g').attr('transform', 'translate(0,300)').call(d3.axisBottom(bx)).selectAll('text')
-        .attr('transform', 'rotate(-45)').style('text-anchor', 'end');
-    bG.append('g').call(d3.axisLeft(by));
-    bG.selectAll('.bar').data(bookingData).enter().append('rect')
-        .attr('x', d => bx(d.operator)).attr('y', d => by(d.months)).attr('width', bx.bandwidth())
-        .attr('height', d => 300 - by(d.months)).attr('fill', '#2d9f5d');
-
-    // Chart 3: Average Speed
-    const speedData = allData.trainOperators.map(d => ({
-        operator: d.operator,
-        speed: +d.average_speed
-    })).filter(d => !isNaN(d.speed));
-    const speedSvg = d3.select('#average-speed-chart').append('svg')
-        .attr('width', '100%').attr('height', 400).attr('viewBox', '0 0 800 400');
-    const sG = speedSvg.append('g').attr('transform', 'translate(60,40)');
-    const sx = d3.scaleBand().domain(speedData.map(d => d.operator)).range([0, 680]).padding(0.2);
-    const sy = d3.scaleLinear().domain([0, d3.max(speedData, d => d.speed)]).range([300, 0]);
-    sG.append('g').attr('transform', 'translate(0,300)').call(d3.axisBottom(sx)).selectAll('text')
-        .attr('transform', 'rotate(-45)').style('text-anchor', 'end');
-    sG.append('g').call(d3.axisLeft(sy));
-    sG.selectAll('.bar').data(speedData).enter().append('rect')
-        .attr('x', d => sx(d.operator)).attr('y', d => sy(d.speed)).attr('width', sx.bandwidth())
-        .attr('height', d => 300 - sy(d.speed)).attr('fill', '#237644');
-
-    // Chart 4: Service Amenities Matrix
-    const amenities = ['Wifi', 'electricity_plug', 'catering_offer', 'external_booking'];
-    const serviceData = allData.trainOperators.flatMap(d => 
-        amenities.map(key => ({ operator: d.operator, amenity: key, value: d[key] === 'Yes' ? 1 : 0 }))
-    );
-    const serviceSvg = d3.select('#service-amenities-chart').append('svg')
-        .attr('width', '100%').attr('height', 400).attr('viewBox', '0 0 800 400');
-    const saG = serviceSvg.append('g').attr('transform', 'translate(100,40)');
-    const saX = d3.scaleBand().domain(amenities).range([0, 500]).padding(0.2);
-    const saY = d3.scaleBand().domain([...new Set(serviceData.map(d => d.operator))]).range([0, 300]).padding(0.2);
-    saG.append('g').attr('transform', 'translate(0,300)').call(d3.axisBottom(saX));
-    saG.append('g').call(d3.axisLeft(saY));
-    saG.selectAll('rect').data(serviceData).enter().append('rect')
-        .attr('x', d => saX(d.amenity)).attr('y', d => saY(d.operator)).attr('width', saX.bandwidth())
-        .attr('height', saY.bandwidth()).attr('fill', d => d.value ? '#2d9f5d' : '#eee');
-
-    // Chart 5: Refund & Modification
-    const refundData = ['cancellation_possible', 'modify_posible'];
-    const refundMatrix = allData.trainOperators.flatMap(d =>
-        refundData.map(k => ({ operator: d.operator, policy: k, value: d[k] === 'yes' ? 1 : 0 }))
-    );
-    const rmSvg = d3.select('#refund-modification-chart').append('svg')
-        .attr('width', '100%').attr('height', 400).attr('viewBox', '0 0 800 400');
-    const rmG = rmSvg.append('g').attr('transform', 'translate(100,40)');
-    const rmX = d3.scaleBand().domain(refundData).range([0, 200]).padding(0.2);
-    const rmY = d3.scaleBand().domain([...new Set(refundMatrix.map(d => d.operator))]).range([0, 300]).padding(0.2);
-    rmG.append('g').attr('transform', 'translate(0,300)').call(d3.axisBottom(rmX));
-    rmG.append('g').call(d3.axisLeft(rmY));
-    rmG.selectAll('rect').data(refundMatrix).enter().append('rect')
-        .attr('x', d => rmX(d.policy)).attr('y', d => rmY(d.operator)).attr('width', rmX.bandwidth())
-        .attr('height', rmY.bandwidth()).attr('fill', d => d.value ? '#bbebd3' : '#eee');
-
-    // Chart 6: Night Train Availability
-    const nightData = d3.rollup(allData.trainOperators, v => v.length, d => d.night_train);
-    const ntData = Array.from(nightData, ([key, value]) => ({ label: key, count: value }));
-    const ntSvg = d3.select('#night-train-chart').append('svg').attr('width', 400).attr('height', 400);
-    const ntG = ntSvg.append('g').attr('transform', 'translate(200,200)');
-    const pie = d3.pie().value(d => d.count)(ntData);
-    const arc = d3.arc().innerRadius(50).outerRadius(150);
-    ntG.selectAll('path').data(pie).enter().append('path')
-        .attr('d', arc).attr('fill', (d, i) => ['#237644', '#bbebd3'][i % 2])
-        .append('title').text(d => `${d.data.label}: ${d.data.count}`);
-
-    // Chart 7: Accessibility Support
-    const accessKeys = ['handicaped_reduced', 'age_reduction_price', 'family_reduction'];
-    const accessData = allData.trainOperators.flatMap(d =>
-        accessKeys.map(k => ({ operator: d.operator, support: k, value: d[k] === 'Yes' ? 1 : 0 }))
-    );
-    const acSvg = d3.select('#accessibility-support-chart').append('svg')
-        .attr('width', '100%').attr('height', 400).attr('viewBox', '0 0 800 400');
-    const acG = acSvg.append('g').attr('transform', 'translate(100,40)');
-    const acX = d3.scaleBand().domain(accessKeys).range([0, 300]).padding(0.2);
-    const acY = d3.scaleBand().domain([...new Set(accessData.map(d => d.operator))]).range([0, 300]).padding(0.2);
-    acG.append('g').attr('transform', 'translate(0,300)').call(d3.axisBottom(acX));
-    acG.append('g').call(d3.axisLeft(acY));
-    acG.selectAll('rect').data(accessData).enter().append('rect')
-        .attr('x', d => acX(d.support)).attr('y', d => acY(d.operator)).attr('width', acX.bandwidth())
-        .attr('height', acY.bandwidth()).attr('fill', d => d.value ? '#2d9f5d' : '#eee');
-
-        .text(d => `${d.operator}\nDelay: ${d.delay} min\nOn-Time: ${d.onTime}%`);
-
-    // Additional chart functions can be similarly added: booking, speed, amenities, etc.
+    document.getElementById(tabName).classList.add('active');
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
 }
 </script>
 
