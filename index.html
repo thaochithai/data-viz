@@ -804,7 +804,21 @@
             return country;
         }
 
-        parseFloat((countryInfo['% electrified length'] || '0').replace('%',''))
+        function parseFloat(countryInfo) {
+            if (!countryInfo || !countryInfo.total_length || countryInfo.total_length === 0) {
+                return 0;
+            }
+
+            if (countryInfo['% electrified length'] && typeof countryInfo['% electrified length'] === 'string') {
+                return parseFloat(countryInfo['% electrified length'].replace('%', ''));
+            }
+
+            const electrified = countryInfo.electrified_rail_length || 0;
+            const total = countryInfo.total_length || 0;
+
+            return total === 0 ? 0 : Math.round((electrified / total) * 100);
+        }
+
 
         function selectCountry(countryInfo) {
             const infoDiv = document.getElementById('selected-country-info');
