@@ -9,6 +9,9 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
     <style>
         * {
             margin: 0;
@@ -17,9 +20,9 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: #ffffff;
-            color: #A8D5A3;
+            color: #237644;
             line-height: 1.6;
         }
 
@@ -39,7 +42,7 @@
 
         /* Navigation Tabs */
         nav {
-            background-color: #A8D5A3;
+            background-color: #237644;
             padding: 0;
             display: flex;
             justify-content: center;
@@ -47,7 +50,7 @@
         }
 
         .tab-button {
-            background-color: #A8D5A3;
+            background-color: #237644;
             color: white;
             border: none;
             padding: 15px 30px;
@@ -59,12 +62,12 @@
         }
 
         .tab-button:hover {
-            background-color: #A8D5A3;
+            background-color: #1a5a33;
         }
 
         .tab-button.active {
-            background-color: #A8D5A3;
-            border-bottom: 3px solid #4A7C59;
+            background-color: #1a5a33;
+            border-bottom: 3px solid #bbebd3;
         }
 
         /* Main Content */
@@ -89,20 +92,20 @@
         }
 
         h2 {
-            color: #2D5A27;
+            color: #237644;
             font-size: 2.5rem;
             margin-bottom: 30px;
             text-align: center;
-            border-bottom: 3px solid #A8D5A3;
+            border-bottom: 3px solid #bbebd3;
             padding-bottom: 15px;
         }
 
         h3 {
-            color: #2D5A27;
+            color: #237644;
             font-size: 1.5rem;
             margin: 30px 0 15px 0;
             padding-left: 10px;
-            border-left: 4px solid #A8D5A3;
+            border-left: 4px solid #bbebd3;
         }
 
         /* Chart Containers */
@@ -118,65 +121,245 @@
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border: 2px solid #A8D5A3;
+            border: 2px solid #bbebd3;
         }
 
         .chart-container h4 {
-            color: #2D5A27;
+            color: #237644;
             margin-bottom: 20px;
             text-align: center;
             font-size: 1.2rem;
         }
 
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
+        /* Overview Section Styles */
+        .overview-section {
+            background-color: #bbebd3;
+            padding: 40px;
+            margin: 20px 0;
+            border-radius: 15px;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, #4A7C59, #2D5A27);
-            color: white;
-            padding: 25px;
+        .overview-section h2 {
+            color: #237644;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: left;
+            border: none;
+            padding: 0;
+        }
+
+        .overview-content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* Stats Cards - New Style */
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat-card-overview {
+            background: white;
+            padding: 20px;
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .stat-card h4 {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            opacity: 0.9;
-        }
-
-        .stat-card .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-card .stat-unit {
+        .stat-card-overview h4 {
+            color: #237644;
             font-size: 0.9rem;
-            opacity: 0.8;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .stat-card-overview .stat-number {
+            color: #237644;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        /* Map Container */
+        .map-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 400px;
+            position: relative;
+        }
+
+        .svg-map-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            gap: 20px;
+        }
+
+        .europe-map-svg {
+            flex: 2;
+            width: 60%;
+            height: 100%;
+        }
+
+        .country {
+            transition: fill 0.3s ease, stroke 0.3s ease;
+        }
+
+        .country:hover {
+            fill: #bbebd3 !important;
+            cursor: pointer;
+        }
+
+        .country-label {
+            font-size: 12px;
+            font-weight: bold;
+            fill: white;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .country-info-panel {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #237644;
+        }
+
+        .country-info-panel h4 {
+            color: #237644;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .country-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .stat-item span:last-child {
+            color: #237644;
+            font-weight: 500;
+        }
+
+        .map-placeholder {
+            display: none;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            background-color: #237644;
+            padding: 40px;
+            margin: 20px 0;
+            border-radius: 15px;
+            color: white;
+        }
+
+        .chart-section-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .chart-left h3 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border: none;
+            padding: 0;
+        }
+
+        .chart-left canvas {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        /* Operators List */
+        .operators-list {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .operators-list h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            border: none;
+            padding: 0;
+        }
+
+        .operators-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .operators-list li {
+            color: white;
+            font-size: 1.1rem;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .operators-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsive Design for Overview */
+        @media (max-width: 768px) {
+            .overview-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-section-content {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Loading and placeholder styles */
         .loading {
             text-align: center;
             padding: 40px;
-            color: #4A7C59;
+            color: #237644;
             font-style: italic;
         }
 
         .placeholder {
             background: #f5f5f5;
-            border: 2px dashed #A8D5A3;
+            border: 2px dashed #bbebd3;
             border-radius: 10px;
             padding: 40px;
             text-align: center;
-            color: #4A7C59;
+            color: #237644;
             margin: 20px 0;
         }
 
@@ -204,8 +387,8 @@
 </head>
 <body>
     <!-- Header Section -->
-   <header>
-    <img <img src="./header/Heading.png" alt="European Train Travel" />
+    <header>
+        <img src="header/Heading.png" alt="no" />
     </header>
 
     <!-- Navigation Tabs -->
@@ -222,55 +405,65 @@
     <main>
         <!-- Tab 1: European Railways Overview -->
         <div id="overview" class="tab-content active">
-            <h2>European Railways Overview</h2>
-            
-            <!-- Statistics Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h4>Total Countries</h4>
-                    <div class="stat-number" id="total-countries">-</div>
-                    <div class="stat-unit">European Countries</div>
+            <!-- Top Section: Railways length and passengers/km by country -->
+            <section class="overview-section">
+                <h2>Railways length and passengers/km by country</h2>
+                
+                <div class="overview-content">
+                    <!-- Left side: Stats Cards -->
+                    <div class="stats-container">
+                        <div class="stat-card-overview">
+                            <h4>Total lengths</h4>
+                            <div class="stat-number" id="total-length">XXX km</div>
+                        </div>
+                        <div class="stat-card-overview">
+                            <h4>Total passenger/km</h4>
+                            <div class="stat-number" id="total-passenger-km">XXX M</div>
+                        </div>
+                        <div class="stat-card-overview">
+                            <h4>% length electrified</h4>
+                            <div class="stat-number" id="electrified-percentage">XX%</div>
+                        </div>
+                        <div class="stat-card-overview">
+                            <h4>Total operator</h4>
+                            <div class="stat-number" id="total-operators">XX</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right side: Interactive Map -->
+                    <div class="map-container">
+                        <div id="europe-map">
+                            <!-- Interactive map will be inserted here -->
+                            <div class="map-placeholder">
+                                <p>Interactive European Railway Map</p>
+                                <p><em>Click on countries to see details</em></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h4>Total Railway Length</h4>
-                    <div class="stat-number" id="total-length">-</div>
-                    <div class="stat-unit">Kilometers</div>
-                </div>
-                <div class="stat-card">
-                    <h4>Electrified Network</h4>
-                    <div class="stat-number" id="electrified-percentage">-</div>
-                    <div class="stat-unit">% Electrified</div>
-                </div>
-                <div class="stat-card">
-                    <h4>Total Passenger-KM</h4>
-                    <div class="stat-number" id="total-passenger-km">-</div>
-                    <div class="stat-unit">Million PKM</div>
-                </div>
-            </div>
+            </section>
 
-            <!-- Charts Section -->
-            <h3>Railway Network Analysis</h3>
-            <div class="chart-grid">
-                <div class="chart-container">
-                    <h4>Railway Length by Country</h4>
-                    <canvas id="lengthByCountryChart"></canvas>
+            <!-- Bottom Section: Top 5 Countries Chart -->
+            <section class="chart-section">
+                <div class="chart-section-content">
+                    <!-- Left side: Bar Chart -->
+                    <div class="chart-left">
+                        <h3>Top 5 countries by train lengths passengers</h3>
+                        <canvas id="top5CountriesChart"></canvas>
+                    </div>
+                    
+                    <!-- Right side: Operators List -->
+                    <div class="operators-list">
+                        <h3>Operators of these country</h3>
+                        <ul id="operators-by-country">
+                            <li>A</li>
+                            <li>B</li>
+                            <li>C</li>
+                            <li>D</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="chart-container">
-                    <h4>Electrification Status</h4>
-                    <canvas id="electrificationChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-grid">
-                <div class="chart-container">
-                    <h4>Passenger Volume by Country</h4>
-                    <canvas id="passengerVolumeChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h4>Network Density Analysis</h4>
-                    <canvas id="networkDensityChart"></canvas>
-                </div>
-            </div>
+            </section>
         </div>
 
         <!-- Tab 2: Operator Comparison -->

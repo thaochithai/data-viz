@@ -266,11 +266,163 @@ function updateOperatorsListForCountry(countryName) {
     }
 }
 
-// Initialize interactive map (placeholder)
+// Initialize interactive map (with basic SVG map)
 function initializeInteractiveMap() {
-    console.log('Interactive map placeholder - will implement with D3.js or Leaflet');
-    // TODO: Implement interactive European map showing railway data by country
-    // This would use D3.js with TopoJSON or SVG map data
+    try {
+        const mapContainer = document.getElementById('europe-map');
+        
+        // Create SVG map container
+        const svgMap = `
+        <div class="svg-map-container">
+            <svg viewBox="0 0 800 600" class="europe-map-svg">
+                <!-- European Countries (simplified paths) -->
+                <g class="countries">
+                    <!-- Germany -->
+                    <path d="M 350 250 L 380 240 L 390 270 L 380 300 L 350 290 Z" 
+                          class="country" data-country="Germany" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="365" y="270" class="country-label">DE</text>
+                    
+                    <!-- France -->
+                    <path d="M 280 280 L 320 270 L 340 310 L 300 320 L 270 300 Z" 
+                          class="country" data-country="France" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="300" y="295" class="country-label">FR</text>
+                    
+                    <!-- Italy -->
+                    <path d="M 380 320 L 400 310 L 420 360 L 400 380 L 380 360 Z" 
+                          class="country" data-country="Italy" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="400" y="345" class="country-label">IT</text>
+                    
+                    <!-- Spain -->
+                    <path d="M 220 340 L 280 330 L 290 370 L 240 380 L 210 360 Z" 
+                          class="country" data-country="Spain" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="250" y="355" class="country-label">ES</text>
+                    
+                    <!-- United Kingdom -->
+                    <path d="M 280 200 L 310 190 L 320 220 L 300 240 L 270 230 Z" 
+                          class="country" data-country="United Kingdom" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="295" y="215" class="country-label">UK</text>
+                    
+                    <!-- Poland -->
+                    <path d="M 420 220 L 450 210 L 460 240 L 440 260 L 410 250 Z" 
+                          class="country" data-country="Poland" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="435" y="235" class="country-label">PL</text>
+                    
+                    <!-- Netherlands -->
+                    <path d="M 340 220 L 360 210 L 370 235 L 350 245 L 330 235 Z" 
+                          class="country" data-country="Netherlands" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="350" y="230" class="country-label">NL</text>
+                    
+                    <!-- Belgium -->
+                    <path d="M 320 240 L 340 235 L 350 250 L 330 260 L 310 255 Z" 
+                          class="country" data-country="Belgium" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="335" y="248" class="country-label">BE</text>
+                    
+                    <!-- Switzerland -->
+                    <path d="M 360 290 L 380 285 L 390 305 L 370 315 L 350 310 Z" 
+                          class="country" data-country="Switzerland" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="370" y="300" class="country-label">CH</text>
+                    
+                    <!-- Austria -->
+                    <path d="M 390 280 L 430 275 L 440 295 L 410 305 L 380 300 Z" 
+                          class="country" data-country="Austria" fill="#4a7c59" stroke="#237644" stroke-width="2"/>
+                    <text x="415" y="290" class="country-label">AT</text>
+                </g>
+            </svg>
+            
+            <!-- Country Info Panel -->
+            <div id="country-info" class="country-info-panel">
+                <h4 id="country-name">Select a country</h4>
+                <div class="country-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Railway Length:</span>
+                        <span id="country-length">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Passenger-KM:</span>
+                        <span id="country-passenger">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">% Electrified:</span>
+                        <span id="country-electrified">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+        
+        mapContainer.innerHTML = svgMap;
+        
+        // Add interactivity to countries
+        const countries = document.querySelectorAll('.country');
+        countries.forEach(country => {
+            country.addEventListener('mouseenter', function() {
+                this.style.fill = '#bbebd3';
+                this.style.cursor = 'pointer';
+                showCountryInfo(this.dataset.country);
+            });
+            
+            country.addEventListener('mouseleave', function() {
+                this.style.fill = '#4a7c59';
+            });
+            
+            country.addEventListener('click', function() {
+                selectCountry(this.dataset.country);
+            });
+        });
+        
+        console.log('Interactive SVG map initialized');
+    } catch (error) {
+        console.error('Error initializing interactive map:', error);
+    }
+}
+
+// Show country information when hovering
+function showCountryInfo(countryName) {
+    try {
+        const countryData_item = countryData.find(row => 
+            row.Country === countryName || 
+            row.Country.toLowerCase().includes(countryName.toLowerCase())
+        );
+        
+        if (countryData_item) {
+            const electrified = parseFloat(countryData_item.electrified_train_length) || 0;
+            const nonElectrified = parseFloat(countryData_item.non_electrified_train_length) || 0;
+            const totalLength = electrified + nonElectrified;
+            const electrificationPercentage = totalLength > 0 ? Math.round((electrified / totalLength) * 100) : 0;
+            const passengerKm = parseFloat(countryData_item.MIO_PKM) || 0;
+            
+            document.getElementById('country-name').textContent = countryName;
+            document.getElementById('country-length').textContent = Math.round(totalLength).toLocaleString() + ' km';
+            document.getElementById('country-passenger').textContent = Math.round(passengerKm).toLocaleString() + ' M';
+            document.getElementById('country-electrified').textContent = electrificationPercentage + '%';
+        } else {
+            document.getElementById('country-name').textContent = countryName;
+            document.getElementById('country-length').textContent = 'No data';
+            document.getElementById('country-passenger').textContent = 'No data';
+            document.getElementById('country-electrified').textContent = 'No data';
+        }
+    } catch (error) {
+        console.error('Error showing country info:', error);
+    }
+}
+
+// Select country and update operators list
+function selectCountry(countryName) {
+    console.log(`Selected country: ${countryName}`);
+    updateOperatorsListForCountry(countryName);
+    
+    // Highlight selected country
+    const countries = document.querySelectorAll('.country');
+    countries.forEach(country => {
+        country.style.stroke = '#237644';
+        country.style.strokeWidth = '2';
+    });
+    
+    const selectedCountry = document.querySelector(`[data-country="${countryName}"]`);
+    if (selectedCountry) {
+        selectedCountry.style.stroke = '#ffffff';
+        selectedCountry.style.strokeWidth = '3';
+    }
 }
 
 // Create Electrification Status Chart
