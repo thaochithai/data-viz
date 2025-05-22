@@ -22,11 +22,13 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #bbebd3 0%, #237644 100%);
+            background: url('header/Heading.png') no-repeat center center;
+            background-size: cover;
             padding: 2rem 1rem;
             text-align: center;
             position: relative;
             overflow: hidden;
+            min-height: 300px;
         }
 
         .header::before {
@@ -36,9 +38,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200"><rect fill="%23bbebd3" width="800" height="200"/><rect fill="%23237644" x="0" y="160" width="800" height="40"/><circle fill="%23237644" cx="150" cy="120" r="30"/><rect fill="%23237644" x="120" y="100" width="60" height="40" rx="5"/><rect fill="white" x="130" y="110" width="15" height="20"/><rect fill="white" x="155" y="110" width="15" height="20"/></svg>') no-repeat center;
-            background-size: cover;
-            opacity: 0.1;
+            background: rgba(35, 118, 68, 0.3);
+            z-index: 1;
         }
 
         .header h1 {
