@@ -6,6 +6,7 @@
     <title>What is it really like to travel by train in Europe?</title>
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
@@ -464,30 +465,212 @@
             document.getElementById('total-operators').textContent = uniqueOperators;
         }
 
-        function createEuropeMap() {
-            // Simplified Europe map using basic shapes
+        async function createEuropeMap() {
             const mapContainer = document.getElementById('europe-map');
             const svg = d3.select(mapContainer)
                 .append('svg')
                 .attr('width', '100%')
                 .attr('height', 400);
 
-            // Create a simple representation with rectangles for countries
-            const countries = allData.countries;
-            const width = 500;
+            const width = 600;
             const height = 400;
-
             svg.attr('viewBox', `0 0 ${width} ${height}`);
-
-            // Simple grid layout for countries
-            const cols = 6;
-            const cellWidth = width / cols;
-            const cellHeight = height / Math.ceil(countries.length / cols);
 
             const tooltip = d3.select('body')
                 .append('div')
                 .attr('class', 'tooltip')
                 .style('opacity', 0);
+
+            try {
+                // Load European map data
+                const europeUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+                const world = await d3.json(europeUrl);
+                
+                // Extract European countries
+                const countries = topojson.feature(world, world.objects.countries);
+                
+                // Define European country bounds for filtering
+                const europeanCountries = countries.features.filter(d => {
+                    const bounds = d3.geoBounds(d);
+                    return bounds[0][0] > -30 && bounds[1][0] < 70 && bounds[0][1] > 30 && bounds[1][1] < 75;
+                });
+
+                // Create projection for Europe
+                const projection = d3.geoConicConformal()
+                    .center([10, 52])
+                    .scale(600)
+                    .translate([width / 2, height / 2]);
+
+                const path = d3.geoPath().projection(projection);
+
+                // Create countries
+                svg.selectAll('.country')
+                    .data(europeanCountries)
+                    .enter()
+                    .append('path')
+                    .attr('class', 'country')
+                    .attr('d', path)
+                    .style('cursor', 'pointer')
+                    .on('mouseover', function(event, d) {
+                        d3.select(this).style('fill', '#237644');
+                        
+                        // Find matching country data
+                        const countryName = d.properties.NAME || d.properties.NAME_EN;
+                        const countryInfo = findCountryData(countryName);
+                        
+                        if (countryInfo) {
+                            tooltip.transition().duration(200).style('opacity', .9);
+                            tooltip.html(`
+                                <strong>${countryInfo.Country}</strong><br/>
+                                Passengers: ${(countryInfo.MIO_PKM || 0).toLocaleString()} M<br/>
+                                Length: ${((countryInfo.electried_train_length || 0) + (countryInfo.non_electrified_train_length || 0)).toLocaleString()} km<br/>
+                                % Electrified: ${calculateElectrifiedPercent(countryInfo)}%
+                            `)
+                            .style('left', (event.pageX + 10) + 'px')
+                            .style('top', (event.pageY - 28) + 'px');
+                        } else {
+                            tooltip.transition().duration(200).style('opacity', .9);
+                            tooltip.html(`<strong>${countryName}</strong><br/>No data available`)
+                            .style('left', (event.pageX + 10) + 'px')
+                            .style('top', (event.pageY - 28) + 'px');
+                        }
+                    })
+                    .on('mouseout', function() {
+                        d3.select(this).style('fill', '#bbebd3');
+                        tooltip.transition().duration(500).style('opacity', 0);
+                    })
+                    .on('click', function(event, d) {
+                        const countryName = d.properties.NAME || d.properties.NAME_EN;
+                        const countryInfo = findCountryData(countryName);
+                        if (countryInfo) {
+                            selectCountry(countryInfo);
+                        }
+                    });
+
+                // Add country labels for countries with data
+                svg.selectAll('.country-label')
+                    .data(europeanCountries.filter(d => {
+                        const countryName = d.properties.NAME || d.properties.NAME_EN;
+                        return findCountryData(countryName);
+                    }))
+                    .enter()
+                    .append('text')
+                    .attr('class', 'country-label')
+                    .attr('transform', d => `translate(${path.centroid(d)})`)
+                    .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'central')
+                    .style('font-size', '8px')
+                    .style('fill', '#237644')
+                    .style('font-weight', '600')
+                    .style('pointer-events', 'none')
+                    .text(d => {
+                        const countryName = d.properties.NAME || d.properties.NAME_EN;
+                        const countryInfo = findCountryData(countryName);
+                        return countryInfo ? (countryInfo.Code || getCountryCode(countryName)) : '';
+                    });
+
+            } catch (error) {
+                console.error('Error loading map data:', error);
+                // Fallback to simple representation
+                createFallbackMap();
+            }
+        }
+
+        function findCountryData(mapCountryName) {
+            if (!mapCountryName) return null;
+            
+            // Direct match
+            let country = allData.countries.find(d => 
+                d.Country && d.Country.toLowerCase() === mapCountryName.toLowerCase()
+            );
+            
+            if (country) return country;
+            
+            // Alternative country name mappings
+            const countryMappings = {
+                'United Kingdom': ['UK', 'Britain', 'Great Britain'],
+                'Germany': ['Deutschland'],
+                'France': ['République française'],
+                'Italy': ['Italia'],
+                'Spain': ['España'],
+                'Poland': ['Polska'],
+                'Netherlands': ['Holland'],
+                'Czech Republic': ['Czechia'],
+                'Bosnia and Herzegovina': ['Bosnia'],
+                'North Macedonia': ['Macedonia'],
+                'Montenegro': ['Crna Gora'],
+                'Serbia': ['Srbija'],
+                'Croatia': ['Hrvatska'],
+                'Slovenia': ['Slovenija'],
+                'Slovakia': ['Slovensko'],
+                'Hungary': ['Magyarország'],
+                'Romania': ['România'],
+                'Bulgaria': ['България'],
+                'Greece': ['Ελλάδα', 'Hellas'],
+                'Portugal': ['República Portuguesa'],
+                'Ireland': ['Éire'],
+                'Austria': ['Österreich'],
+                'Switzerland': ['Schweiz', 'Suisse'],
+                'Belgium': ['België', 'Belgique'],
+                'Luxembourg': ['Lëtzebuerg'],
+                'Denmark': ['Danmark'],
+                'Sweden': ['Sverige'],
+                'Norway': ['Norge'],
+                'Finland': ['Suomi'],
+                'Estonia': ['Eesti'],
+                'Latvia': ['Latvija'],
+                'Lithuania': ['Lietuva']
+            };
+            
+            // Check alternative names
+            for (const [standardName, alternatives] of Object.entries(countryMappings)) {
+                if (mapCountryName.toLowerCase() === standardName.toLowerCase()) {
+                    country = allData.countries.find(d => 
+                        d.Country && (
+                            d.Country.toLowerCase() === standardName.toLowerCase() ||
+                            alternatives.some(alt => d.Country.toLowerCase().includes(alt.toLowerCase()))
+                        )
+                    );
+                    if (country) return country;
+                }
+            }
+            
+            // Partial match
+            return allData.countries.find(d => 
+                d.Country && (
+                    d.Country.toLowerCase().includes(mapCountryName.toLowerCase()) ||
+                    mapCountryName.toLowerCase().includes(d.Country.toLowerCase())
+                )
+            );
+        }
+
+        function getCountryCode(countryName) {
+            const codes = {
+                'Germany': 'DE', 'France': 'FR', 'Italy': 'IT', 'Spain': 'ES',
+                'United Kingdom': 'UK', 'Poland': 'PL', 'Netherlands': 'NL',
+                'Belgium': 'BE', 'Czech Republic': 'CZ', 'Austria': 'AT',
+                'Switzerland': 'CH', 'Sweden': 'SE', 'Norway': 'NO',
+                'Denmark': 'DK', 'Finland': 'FI', 'Portugal': 'PT',
+                'Greece': 'GR', 'Ireland': 'IE', 'Hungary': 'HU',
+                'Romania': 'RO', 'Bulgaria': 'BG', 'Croatia': 'HR',
+                'Slovenia': 'SI', 'Slovakia': 'SK', 'Estonia': 'EE',
+                'Latvia': 'LV', 'Lithuania': 'LT', 'Luxembourg': 'LU'
+            };
+            return codes[countryName] || countryName.substring(0, 2).toUpperCase();
+        }
+
+        function calculateElectrifiedPercent(country) {
+            const totalLength = (country.electried_train_length || 0) + (country.non_electrified_train_length || 0);
+            return totalLength > 0 ? ((country.electried_train_length || 0) / totalLength * 100).toFixed(1) : 0;
+        }
+
+        function createFallbackMap() {
+            // Simple fallback if map loading fails
+            const svg = d3.select('#europe-map svg');
+            const countries = allData.countries;
+            const cols = 6;
+            const cellWidth = 600 / cols;
+            const cellHeight = 400 / Math.ceil(countries.length / cols);
 
             countries.forEach((country, i) => {
                 const x = (i % cols) * cellWidth;
@@ -501,21 +684,6 @@
                     .attr('height', cellHeight - 10)
                     .attr('rx', 5)
                     .style('cursor', 'pointer')
-                    .on('mouseover', function(event, d) {
-                        d3.select(this).style('fill', '#237644');
-                        tooltip.transition().duration(200).style('opacity', .9);
-                        tooltip.html(`
-                            <strong>${country.Country}</strong><br/>
-                            Passengers: ${(country.MIO_PKM || 0).toLocaleString()} M<br/>
-                            Length: ${((country.electried_train_length || 0) + (country.non_electrified_train_length || 0)).toLocaleString()} km
-                        `)
-                        .style('left', (event.pageX + 10) + 'px')
-                        .style('top', (event.pageY - 28) + 'px');
-                    })
-                    .on('mouseout', function(d) {
-                        d3.select(this).style('fill', '#bbebd3');
-                        tooltip.transition().duration(500).style('opacity', 0);
-                    })
                     .on('click', function() {
                         selectCountry(country);
                     });
