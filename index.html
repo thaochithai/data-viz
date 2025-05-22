@@ -426,9 +426,9 @@
                 allData.routes = Papa.parse(texts[2], { header: true, dynamicTyping: true }).data;
                 allData.trainOperators = Papa.parse(texts[3], { header: true, dynamicTyping: true }).data;
 
-                // Clean the data
-                allData.countries = allData.countries.filter(d => d.Country && d.Country.trim());
-                allData.operators = allData.operators.filter(d => d.Operator && d.Operator.trim());
+                // Clean the data - use correct column names
+                allData.countries = allData.countries.filter(d => d.country && d.country.trim());
+                allData.operators = allData.operators.filter(d => d.operator && d.operator.trim());
                 allData.routes = allData.routes.filter(d => d.operator && d.operator.trim());
                 allData.trainOperators = allData.trainOperators.filter(d => d.operator && d.operator.trim());
 
@@ -458,13 +458,13 @@
 
         function updateOverviewStats() {
             const countries = allData.countries;
-            const totalLength = countries.reduce((sum, d) => sum + (d.electried_train_length || 0) + (d.non_electrified_train_length || 0), 0);
+            const totalLength = countries.reduce((sum, d) => sum + (d.total_length || 0), 0);
             const totalPassengers = countries.reduce((sum, d) => sum + (d.MIO_PKM || 0), 0);
-            const totalElectrified = countries.reduce((sum, d) => sum + (d.electried_train_length || 0), 0);
+            const totalElectrified = countries.reduce((sum, d) => sum + (d.eletrified_rail_length || 0), 0);
             const electrifiedPercent = totalLength > 0 ? (totalElectrified / totalLength * 100).toFixed(1) : 0;
             
             // Count unique operators
-            const uniqueOperators = new Set(allData.operators.map(d => d.Operator)).size;
+            const uniqueOperators = new Set(allData.operators.map(d => d.operator)).size;
 
             document.getElementById('total-length').textContent = `${totalLength.toLocaleString()} km`;
             document.getElementById('total-passengers').textContent = `${totalPassengers.toLocaleString()} M`;
@@ -528,9 +528,9 @@
                         if (countryInfo) {
                             tooltip.transition().duration(200).style('opacity', .9);
                             tooltip.html(`
-                                <strong>${countryInfo.Country}</strong><br/>
+                                <strong>${countryInfo.country}</strong><br/>
                                 Passengers: ${(countryInfo.MIO_PKM || 0).toLocaleString()} M<br/>
-                                Length: ${((countryInfo.electried_train_length || 0) + (countryInfo.non_electrified_train_length || 0)).toLocaleString()} km<br/>
+                                Length: ${(countryInfo.total_length || 0).toLocaleString()} km<br/>
                                 % Electrified: ${calculateElectrifiedPercent(countryInfo)}%
                             `)
                             .style('left', (event.pageX + 10) + 'px')
@@ -589,11 +589,11 @@
                 return null;
             }
             
-            console.log('Looking for country:', mapCountryName, 'in data:', allData.countries.map(d => d.Country));
+            console.log('Looking for country:', mapCountryName, 'in data:', allData.countries.map(d => d.country));
             
             // Direct match
             let country = allData.countries.find(d => 
-                d.Country && d.Country.toLowerCase() === mapCountryName.toLowerCase()
+                d.country && d.country.toLowerCase() === mapCountryName.toLowerCase()
             );
             
             if (country) {
@@ -642,11 +642,11 @@
                 if (mapCountryName.toLowerCase() === standardName.toLowerCase()) {
                     // Look for the standard name or alternatives in our data
                     country = allData.countries.find(d => 
-                        d.Country && (
-                            d.Country.toLowerCase() === standardName.toLowerCase() ||
+                        d.country && (
+                            d.country.toLowerCase() === standardName.toLowerCase() ||
                             alternatives.some(alt => 
-                                d.Country.toLowerCase() === alt.toLowerCase() ||
-                                d.Country.toLowerCase().includes(alt.toLowerCase())
+                                d.country.toLowerCase() === alt.toLowerCase() ||
+                                d.country.toLowerCase().includes(alt.toLowerCase())
                             )
                         )
                     );
@@ -659,7 +659,7 @@
             
             // Check if our data country name matches any mapping
             country = allData.countries.find(dataCountry => {
-                const dataCountryLower = dataCountry.Country.toLowerCase();
+                const dataCountryLower = dataCountry.country.toLowerCase();
                 for (const [standardName, alternatives] of Object.entries(countryMappings)) {
                     if (standardName.toLowerCase() === mapCountryName.toLowerCase() ||
                         alternatives.some(alt => alt.toLowerCase() === mapCountryName.toLowerCase())) {
@@ -679,9 +679,9 @@
             
             // Partial match as last resort
             country = allData.countries.find(d => 
-                d.Country && (
-                    d.Country.toLowerCase().includes(mapCountryName.toLowerCase()) ||
-                    mapCountryName.toLowerCase().includes(d.Country.toLowerCase())
+                d.country && (
+                    d.country.toLowerCase().includes(mapCountryName.toLowerCase()) ||
+                    mapCountryName.toLowerCase().includes(d.country.toLowerCase())
                 )
             );
             
@@ -710,8 +710,12 @@
         }
 
         function calculateElectrifiedPercent(country) {
-            const totalLength = (country.electried_train_length || 0) + (country.non_electrified_train_length || 0);
-            return totalLength > 0 ? ((country.electried_train_length || 0) / totalLength * 100).toFixed(1) : 0;
+            // Use the existing percentage column or calculate if needed
+            if (country['% electried length']) {
+                return parseFloat(country['% electried length'].toString().replace('%', ''));
+            }
+            const totalLength = country.total_length || 0;
+            return totalLength > 0 ? ((country.eletrified_rail_length || 0) / totalLength * 100).toFixed(1) : 0;
         }
 
         function createFallbackMap() {
@@ -751,13 +755,11 @@
         }
 
         function selectCountry(country) {
-            const totalLength = (country.electried_train_length || 0) + (country.non_electrified_train_length || 0);
-            const electrifiedPercent = totalLength > 0 ? 
-                ((country.electried_train_length || 0) / totalLength * 100).toFixed(1) : 0;
+            const electrifiedPercent = calculateElectrifiedPercent(country);
 
-            document.getElementById('selected-country').textContent = country.Country;
+            document.getElementById('selected-country').textContent = country.country;
             document.getElementById('country-passengers').textContent = (country.MIO_PKM || 0).toLocaleString();
-            document.getElementById('country-length').textContent = totalLength.toLocaleString();
+            document.getElementById('country-length').textContent = (country.total_length || 0).toLocaleString();
             document.getElementById('country-electrified').textContent = electrifiedPercent;
             document.getElementById('country-info').style.display = 'block';
         }
@@ -766,7 +768,7 @@
             const countries = allData.countries
                 .map(d => ({
                     ...d,
-                    totalLength: (d.electried_train_length || 0) + (d.non_electrified_train_length || 0)
+                    totalLength: d.total_length || 0
                 }))
                 .sort((a, b) => b.MIO_PKM - a.MIO_PKM)
                 .slice(0, 5);
@@ -788,7 +790,7 @@
             const x = d3.scaleBand()
                 .rangeRound([0, width])
                 .padding(0.1)
-                .domain(countries.map(d => d.Country));
+                .domain(countries.map(d => d.country));
 
             const y = d3.scaleLinear()
                 .rangeRound([height, 0])
@@ -805,7 +807,7 @@
                 .data(countries)
                 .enter().append('rect')
                 .attr('class', 'bar')
-                .attr('x', d => x(d.Country))
+                .attr('x', d => x(d.country))
                 .attr('y', d => y(d.MIO_PKM))
                 .attr('width', x.bandwidth())
                 .attr('height', d => height - y(d.MIO_PKM))
@@ -815,15 +817,15 @@
         }
 
         function createRouteComparisonChart() {
-            const routes = allData.routes.filter(d => d.intercity_or_international && d['Price Euros']);
+            const routes = allData.routes.filter(d => d.intercity_or_international && d[' price_eur ']);
             
             if (routes.length === 0) return;
 
             const intercityRoutes = routes.filter(d => d.intercity_or_international.toLowerCase().includes('intercity'));
             const internationalRoutes = routes.filter(d => d.intercity_or_international.toLowerCase().includes('international'));
 
-            const avgIntercityPrice = d3.mean(intercityRoutes, d => d['Price Euros']);
-            const avgInternationalPrice = d3.mean(internationalRoutes, d => d['Price Euros']);
+            const avgIntercityPrice = d3.mean(intercityRoutes, d => parseFloat(d[' price_eur ']) || 0);
+            const avgInternationalPrice = d3.mean(internationalRoutes, d => parseFloat(d[' price_eur ']) || 0);
             const avgIntercitySpeed = d3.mean(intercityRoutes, d => d.speed_km_per_hour);
             const avgInternationalSpeed = d3.mean(internationalRoutes, d => d.speed_km_per_hour);
 
@@ -911,7 +913,7 @@
         }
 
         function createCyclistChart() {
-            const operators = allData.trainOperators.filter(d => d.with_bike && d.with_bike > 0);
+            const operators = allData.trainOperators.filter(d => d.with_bike && d.with_bike.trim() && d.with_bike !== '0');
             
             if (operators.length === 0) return;
 
@@ -940,9 +942,15 @@
                 .padding(0.1)
                 .domain(operators.map(d => d.operator));
 
+            // Parse with_bike values (could be percentages like "75%" or numbers)
+            const maxValue = d3.max(operators, d => {
+                let value = d.with_bike.toString().replace('%', '');
+                return parseFloat(value) || 0;
+            });
+
             const y = d3.scaleLinear()
                 .rangeRound([height, 0])
-                .domain([0, 100]);
+                .domain([0, Math.max(maxValue, 100)]);
 
             g.append('g')
                 .attr('transform', `translate(0,${height})`)
@@ -961,9 +969,15 @@
                 .enter().append('rect')
                 .attr('class', 'bar')
                 .attr('x', d => x(d.operator))
-                .attr('y', d => y(d.with_bike))
+                .attr('y', d => {
+                    let value = d.with_bike.toString().replace('%', '');
+                    return y(parseFloat(value) || 0);
+                })
                 .attr('width', x.bandwidth())
-                .attr('height', d => height - y(d.with_bike))
+                .attr('height', d => {
+                    let value = d.with_bike.toString().replace('%', '');
+                    return height - y(parseFloat(value) || 0);
+                })
                 .attr('fill', '#bbebd3')
                 .attr('stroke', '#237644')
                 .attr('stroke-width', 1)
@@ -971,7 +985,7 @@
                     tooltip.transition().duration(200).style('opacity', .9);
                     tooltip.html(`
                         <strong>${d.operator}</strong><br/>
-                        Cyclists allowed: ${d.with_bike}%<br/>
+                        Cyclists allowed: ${d.with_bike}<br/>
                         Service: ${d.service || 'N/A'}<br/>
                         Average Speed: ${d.average_speed || 'N/A'} km/h
                     `)
@@ -982,17 +996,20 @@
                     tooltip.transition().duration(500).style('opacity', 0);
                 });
 
-            // Add percentage labels on bars
+            // Add labels on bars
             g.selectAll('.bar-label')
                 .data(operators)
                 .enter().append('text')
                 .attr('class', 'bar-label')
                 .attr('x', d => x(d.operator) + x.bandwidth() / 2)
-                .attr('y', d => y(d.with_bike) - 5)
+                .attr('y', d => {
+                    let value = d.with_bike.toString().replace('%', '');
+                    return y(parseFloat(value) || 0) - 5;
+                })
                 .attr('text-anchor', 'middle')
-                .style('font-size', '10px')
+                .style('font-size', '8px')
                 .style('fill', '#237644')
-                .text(d => `${d.with_bike}%`);
+                .text(d => d.with_bike);
         }
 
         function createServiceMetricsChart() {
@@ -1315,26 +1332,6 @@
                 row.dataset.wifi = operator.Wifi || '';
                 row.dataset.plug = operator.electricity_plug || '';
                 row.dataset.night = operator.night_train || '';
-            });
-        }
-
-        function filterOperators() {
-            const cateringFilter = document.getElementById('filter-catering').checked;
-            const wifiFilter = document.getElementById('filter-wifi').checked;
-            const plugFilter = document.getElementById('filter-plug').checked;
-            const nightFilter = document.getElementById('filter-night').checked;
-
-            const rows = document.querySelectorAll('#operators-table-body tr');
-            
-            rows.forEach(row => {
-                let show = true;
-                
-                if (cateringFilter && row.dataset.catering !== 'yes') show = false;
-                if (wifiFilter && row.dataset.wifi !== 'yes') show = false;
-                if (plugFilter && row.dataset.plug !== 'yes') show = false;
-                if (nightFilter && row.dataset.night !== 'yes') show = false;
-                
-                row.style.display = show ? '' : 'none';
             });
         }
 
