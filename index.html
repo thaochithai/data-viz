@@ -40,7 +40,7 @@
         .header h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            color: white;
+            color: #237644;
             margin-bottom: 0.5rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
@@ -367,13 +367,49 @@
     </div>
 
     <div class="nav-tabs">
-        <button class="nav-tab active" onclick="showTab('operators-by-country')">Operators by Country</button>
+        <button class="nav-tab active" onclick="showTab('europe-map-tab')">Europe map</button>
+        <button class="nav-tab" onclick="showTab('operators-by-country')">Operators by country</button>
         <button class="nav-tab" onclick="showTab('refund-policies')">Refund & Cancellation</button>
-        <button class="nav-tab" onclick="showTab('superstar-operators')">Top 5 Superstar Operators</button>
-        <button class="nav-tab" onclick="showTab('route-comparison')">Route Comparison</button>
+        <button class="nav-tab" onclick="showTab('superstar-operators')">Top 5 Superstar operators</button>
+        <button class="nav-tab" onclick="showTab('route-comparison')">Route comparison</button>
     </div>
 
-    <div id="operators-by-country" class="tab-content active">
+    <div id="europe-map-tab" class="tab-content active">
+    <div class="chart-container">
+        <h2 class="chart-title">European Railway Network Overview</h2>
+        <p style="text-align: center; margin-bottom: 1rem; color: #666;">
+            Click on any country to see detailed railway statistics. Hover for quick info.
+        </p>
+        <div id="europe-map"></div>
+    </div>
+
+    <div class="selected-country-info" id="selected-country-info">
+        <h3 id="selected-country-name">Select a country</h3>
+        <div class="country-stats">
+            <div class="country-stat">
+                <h4>Total Railway Length</h4>
+                <div class="value" id="selected-total-length">-</div>
+                <small>kilometers</small>
+            </div>
+            <div class="country-stat">
+                <h4>Electrified Length</h4>
+                <div class="value" id="selected-electrified-length">-</div>
+                <small>kilometers</small>
+            </div>
+            <div class="country-stat">
+                <h4>% Electrified</h4>
+                <div class="value" id="selected-electrified-percent">-</div>
+                <small>of total network</small>
+            </div>
+            <div class="country-stat">
+                <h4>Annual Passengers</h4>
+                <div class="value" id="selected-passengers">-</div>
+                <small>million passenger-km</small>
+            </div>
+        </div>
+    </div>
+
+    <div id="operators-by-country" class="tab-content">
         <div class="chart-container">
             <h2 class="chart-title">Number of Train Operators by Country</h2>
             <div id="operators-by-country-chart"></div>
