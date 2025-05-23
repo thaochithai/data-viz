@@ -16,8 +16,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #0a0e1a;
-            color: #e0e6ed;
+            background-color: #f0f9f4;
+            color: #1a3028;
             line-height: 1.6;
             overflow-x: hidden;
         }
@@ -29,7 +29,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0a0e1a 0%, #1a2332 100%);
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a2332 100%), 
+                url('/mnt/data/heading_2.png') center/cover no-repeat;
             overflow: hidden;
         }
 
@@ -38,7 +39,7 @@
             position: absolute;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(45, 159, 93, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
             animation: pulse 4s ease-in-out infinite;
         }
 
@@ -58,15 +59,15 @@
             font-size: clamp(2.5rem, 8vw, 5rem);
             font-weight: 900;
             margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #2d9f5d 0%, #4ac77d 100%);
-            -webkit-text-fill-color: transparent;
+            color: #0d4f2a;
             letter-spacing: -2px;
             animation: fadeInUp 1s ease-out;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .hero-subtitle {
             font-size: clamp(1.2rem, 3vw, 1.8rem);
-            color: #a0aec0;
+            color: #2a5f3e;
             margin-bottom: 3rem;
             animation: fadeInUp 1s ease-out 0.2s both;
         }
@@ -95,9 +96,9 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(10, 14, 26, 0.95);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .nav-tabs {
@@ -115,13 +116,13 @@
 
         .nav-tab {
             background: none;
-            border: 2px solid transparent;
+            border: 2px solid #4a9d5f;
             padding: 0.75rem 1.5rem;
             border-radius: 30px;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
-            color: #a0aec0;
+            color: #2a5f3e;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
             position: relative;
@@ -136,7 +137,7 @@
             width: 0;
             height: 0;
             border-radius: 50%;
-            background: rgba(45, 159, 93, 0.3);
+            background: rgba(74, 157, 95, 0.3);
             transform: translate(-50%, -50%);
             transition: width 0.5s, height 0.5s;
         }
@@ -147,13 +148,13 @@
         }
 
         .nav-tab:hover {
-            color: #4ac77d;
-            border-color: #4ac77d;
+            color: #ffffff;
+            border-color: #4a9d5f;
             transform: translateY(-2px);
         }
 
         .nav-tab.active {
-            background: linear-gradient(135deg, #2d9f5d 0%, #4ac77d 100%);
+            background: linear-gradient(135deg, #4a9d5f 0%, #6dc77a 100%);
             color: white;
             border-color: transparent;
         }
@@ -163,6 +164,11 @@
             min-height: 100vh;
             padding: 4rem 2rem;
             position: relative;
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
         }
 
         .container {
@@ -180,13 +186,12 @@
             font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 800;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #4ac77d 0%, #2d9f5d 100%);
-            -webkit-text-fill-color: transparent;
+            color: #0d4f2a;
         }
 
         .section-subtitle {
             font-size: 1.3rem;
-            color: #a0aec0;
+            color: #3d7050;
             max-width: 700px;
             margin: 0 auto;
         }
@@ -200,13 +205,14 @@
         }
 
         .extreme-card {
-            background: linear-gradient(135deg, rgba(26, 35, 50, 0.8) 0%, rgba(26, 35, 50, 0.4) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            border: 2px solid #a7e9af;
             border-radius: 20px;
             padding: 2rem;
             position: relative;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .extreme-card::before {
@@ -216,7 +222,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(74, 199, 125, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(109, 199, 122, 0.1) 0%, transparent 70%);
             transform: rotate(45deg);
             transition: all 0.5s;
             opacity: 0;
@@ -228,8 +234,8 @@
 
         .extreme-card:hover {
             transform: translateY(-5px);
-            border-color: #4ac77d;
-            box-shadow: 0 10px 30px rgba(74, 199, 125, 0.2);
+            border-color: #4a9d5f;
+            box-shadow: 0 10px 30px rgba(74, 157, 95, 0.2);
         }
 
         .extreme-icon {
@@ -240,46 +246,48 @@
         .extreme-value {
             font-size: 2.5rem;
             font-weight: 900;
-            color: #4ac77d;
+            color: #4a9d5f;
             margin-bottom: 0.5rem;
         }
 
         .extreme-label {
             font-size: 1.1rem;
-            color: #a0aec0;
+            color: #3d7050;
             margin-bottom: 0.5rem;
+            font-weight: 600;
         }
 
         .extreme-detail {
             font-size: 0.9rem;
-            color: #718096;
+            color: #5a8069;
         }
 
         /* Map Section */
         .map-container {
-            background: rgba(26, 35, 50, 0.4);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 20px;
             padding: 2rem;
             margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #a7e9af;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         #europe-map {
             width: 100%;
             height: 600px;
             border-radius: 12px;
-            background: rgba(10, 14, 26, 0.5);
+            background: rgba(240, 249, 244, 0.5);
         }
 
         .country {
-            stroke: rgba(255, 255, 255, 0.2);
+            stroke: rgba(13, 79, 42, 0.2);
             stroke-width: 0.5;
             transition: all 0.3s ease;
             cursor: pointer;
         }
 
         .country:hover {
-            stroke: #4ac77d;
+            stroke: #4a9d5f;
             stroke-width: 2;
             filter: brightness(1.2);
         }
@@ -291,13 +299,14 @@
             top: 0;
             width: 400px;
             height: 100vh;
-            background: rgba(26, 35, 50, 0.95);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 2px solid #a7e9af;
             padding: 2rem;
             transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
             z-index: 200;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
         }
 
         .country-info-panel.active {
@@ -310,14 +319,14 @@
             right: 1rem;
             background: none;
             border: none;
-            color: #a0aec0;
+            color: #3d7050;
             font-size: 2rem;
             cursor: pointer;
             transition: color 0.3s;
         }
 
         .close-panel:hover {
-            color: #4ac77d;
+            color: #4a9d5f;
         }
 
         /* Operator Cards */
@@ -328,8 +337,8 @@
         }
 
         .operator-card {
-            background: linear-gradient(135deg, rgba(26, 35, 50, 0.8) 0%, rgba(26, 35, 50, 0.4) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            border: 2px solid #a7e9af;
             border-radius: 20px;
             padding: 2rem;
             display: grid;
@@ -337,25 +346,25 @@
             gap: 2rem;
             align-items: center;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .operator-card:hover {
             transform: translateX(10px);
-            border-color: #4ac77d;
-            box-shadow: 0 10px 30px rgba(74, 199, 125, 0.2);
+            border-color: #4a9d5f;
+            box-shadow: 0 10px 30px rgba(74, 157, 95, 0.2);
         }
 
         .operator-rank {
             font-size: 4rem;
             font-weight: 900;
-            color: #2d9f5d;
-            opacity: 0.3;
+            color: #a7e9af;
         }
 
         .operator-info h3 {
             font-size: 1.8rem;
             margin-bottom: 0.5rem;
-            color: #4ac77d;
+            color: #0d4f2a;
         }
 
         .operator-stats {
@@ -371,12 +380,12 @@
         .operator-stat-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #4ac77d;
+            color: #4a9d5f;
         }
 
         .operator-stat-label {
             font-size: 0.8rem;
-            color: #a0aec0;
+            color: #5a8069;
         }
 
         /* Features Grid */
@@ -388,13 +397,14 @@
         }
 
         .feature-badge {
-            background: rgba(74, 199, 125, 0.1);
-            border: 1px solid rgba(74, 199, 125, 0.3);
+            background: rgba(167, 233, 175, 0.2);
+            border: 1px solid rgba(74, 157, 95, 0.5);
             padding: 0.5rem;
             border-radius: 10px;
             text-align: center;
             font-size: 0.9rem;
-            color: #4ac77d;
+            color: #2a5f3e;
+            font-weight: 500;
         }
 
         /* Route Analysis */
@@ -406,8 +416,8 @@
         }
 
         .route-stat-card {
-            background: linear-gradient(135deg, rgba(74, 199, 125, 0.1) 0%, rgba(45, 159, 93, 0.05) 100%);
-            border: 1px solid rgba(74, 199, 125, 0.3);
+            background: linear-gradient(135deg, rgba(167, 233, 175, 0.3) 0%, rgba(109, 199, 122, 0.2) 100%);
+            border: 2px solid rgba(74, 157, 95, 0.5);
             border-radius: 15px;
             padding: 2rem;
             text-align: center;
@@ -416,21 +426,21 @@
 
         .route-stat-card:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(74, 199, 125, 0.3);
+            box-shadow: 0 10px 30px rgba(74, 157, 95, 0.3);
         }
 
         /* Tooltips */
         .tooltip {
             position: absolute;
             padding: 1rem;
-            background: rgba(26, 35, 50, 0.95);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            color: white;
+            color: #1a3028;
             border-radius: 12px;
             font-size: 0.9rem;
             pointer-events: none;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(74, 199, 125, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(74, 157, 95, 0.5);
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -446,15 +456,15 @@
             justify-content: center;
             min-height: 400px;
             font-size: 1.2rem;
-            color: #a0aec0;
+            color: #3d7050;
         }
 
         .loading::before {
             content: '';
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(74, 199, 125, 0.3);
-            border-top-color: #4ac77d;
+            border: 3px solid rgba(74, 157, 95, 0.3);
+            border-top-color: #4a9d5f;
             border-radius: 50%;
             margin-right: 1rem;
             animation: spin 1s linear infinite;
@@ -467,7 +477,7 @@
         .error {
             background: rgba(220, 38, 38, 0.1);
             border: 1px solid rgba(220, 38, 38, 0.3);
-            color: #fc8181;
+            color: #dc2626;
             padding: 1.5rem;
             border-radius: 12px;
             margin: 2rem 0;
@@ -501,11 +511,12 @@
 
         /* Journey Planner */
         .journey-planner {
-            background: linear-gradient(135deg, rgba(26, 35, 50, 0.8) 0%, rgba(26, 35, 50, 0.4) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            border: 2px solid #a7e9af;
             border-radius: 20px;
             padding: 3rem;
             margin: 4rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .journey-form {
@@ -522,14 +533,15 @@
 
         .form-label {
             font-size: 0.9rem;
-            color: #a0aec0;
+            color: #3d7050;
             margin-bottom: 0.5rem;
+            font-weight: 600;
         }
 
         .form-input {
-            background: rgba(10, 14, 26, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
+            background: rgba(240, 249, 244, 0.5);
+            border: 1px solid #a7e9af;
+            color: #1a3028;
             padding: 0.75rem 1rem;
             border-radius: 10px;
             font-size: 1rem;
@@ -538,8 +550,9 @@
 
         .form-input:focus {
             outline: none;
-            border-color: #4ac77d;
-            box-shadow: 0 0 0 3px rgba(74, 199, 125, 0.1);
+            border-color: #4a9d5f;
+            box-shadow: 0 0 0 3px rgba(74, 157, 95, 0.1);
+            background: white;
         }
 
         .journey-results {
@@ -549,8 +562,8 @@
         }
 
         .journey-option {
-            background: rgba(10, 14, 26, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(240, 249, 244, 0.5);
+            border: 1px solid #a7e9af;
             border-radius: 15px;
             padding: 1.5rem;
             display: grid;
@@ -561,24 +574,41 @@
         }
 
         .journey-option:hover {
-            border-color: #4ac77d;
+            border-color: #4a9d5f;
             transform: translateX(5px);
+            background: white;
         }
 
         /* Fun Facts */
         .fun-fact {
-            background: linear-gradient(135deg, rgba(74, 199, 125, 0.1) 0%, transparent 100%);
-            border-left: 4px solid #4ac77d;
+            background: linear-gradient(135deg, rgba(167, 233, 175, 0.2) 0%, transparent 100%);
+            border-left: 4px solid #4a9d5f;
             padding: 1.5rem;
             margin: 2rem 0;
             border-radius: 0 15px 15px 0;
             font-style: italic;
-            color: #a0aec0;
+            color: #3d7050;
         }
 
         .fun-fact strong {
-            color: #4ac77d;
+            color: #0d4f2a;
             font-style: normal;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a9d5f 0%, #6dc77a 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 157, 95, 0.3);
         }
     </style>
 </head>
@@ -590,7 +620,7 @@
             <p class="hero-subtitle">From 19 km/h mountain railways to 274 km/h speed demons</p>
             <div class="scroll-indicator">
                 <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-                    <path d="M15 20L10 15L11.4 13.6L15 17.2L18.6 13.6L20 15L15 20Z" fill="#4ac77d"/>
+                    <path d="M15 20L10 15L11.4 13.6L15 17.2L18.6 13.6L20 15L15 20Z" fill="#0d4f2a"/>
                 </svg>
             </div>
         </div>
@@ -667,7 +697,7 @@
     </section>
 
     <!-- Europe Map Section -->
-    <section id="europe-map" class="content-section tab-content">
+    <section id="europe-map-section" class="content-section tab-content">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Rail Nations of Europe</h2>
@@ -695,314 +725,11 @@
                     <div class="extreme-value">7.5x</div>
                     <div class="extreme-label">Less CO₂ than Flying</div>
                 </div>
-                <div class="route-stat-card">
-                    <div class="extreme-value">4x</div>
-                    <div class="extreme-label">Less CO₂ than Driving</div>
-                </div>
-            </div>
-
-            <div class="extremes-grid">
-                <div class="extreme-card">
-                    <div class="extreme-icon">🇨🇭</div>
-                    <div class="extreme-value">100%</div>
-                    <div class="extreme-label">Switzerland</div>
-                    <div class="extreme-detail">Fully electrified network powered by renewable energy</div>
-                </div>
-                <div class="extreme-card">
-                    <div class="extreme-icon">🇳🇱</div>
-                    <div class="extreme-value">100%</div>
-                    <div class="extreme-label">Netherlands</div>
-                    <div class="extreme-detail">All electric trains run on wind power since 2017</div>
-                </div>
-                <div class="extreme-card">
-                    <div class="extreme-icon">🌙</div>
-                    <div class="extreme-value">Growing</div>
-                    <div class="extreme-label">Night Trains</div>
-                    <div class="extreme-detail">Revival of overnight services as eco-friendly alternative to flights</div>
-                </div>
             </div>
 
             <div class="fun-fact">
                 <strong>Climate win:</strong> If just 10% of European flights under 1000km switched to rail, 
                 we'd save 1.5 million tonnes of CO₂ annually - equivalent to removing 750,000 cars from the roads!
-            </div>
-        </div>
-    </section>
-
-    <!-- Country Info Panel -->
-    <div class="country-info-panel">
-        <button class="close-panel" onclick="closeCountryPanel()">×</button>
-        <div id="country-details">
-            <!-- Country details will be populated here -->
-        </div>
-    </div>
-
-    <!-- Tooltip -->
-    <div class="tooltip"></div>
-
-    <script>
-        // Global variables
-        let countryData = [];
-        let operatorData = [];
-        let routeData = [];
-        let currentTab = 'extremes';
-
-        // Tab switching
-        function showTab(tabId, event) {
-            // Update active tab
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Update content
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            
-            currentTab = tabId;
-            
-            // Initialize specific tab content
-            if (tabId === 'europe-map' && !document.querySelector('#europe-map svg')) {
-                initializeMap();
-            }
-        }
-
-        // Load data
-        async function loadData() {
-            try {
-                // Load country data
-                const countryResponse = await fetch('country_passenger_km_train_length.csv');
-                const countryText = await countryResponse.text();
-                countryData = Papa.parse(countryText, { header: true, dynamicTyping: true }).data;
-                
-                // Load operator data
-                const operatorResponse = await fetch('operators_comparison.csv');
-                const operatorText = await operatorResponse.text();
-                operatorData = Papa.parse(operatorText, { header: true, dynamicTyping: true }).data;
-                
-                // Load route data
-                const routeResponse = await fetch('route_breakdown.csv');
-                const routeText = await routeResponse.text();
-                routeData = Papa.parse(routeText, { header: true, dynamicTyping: true }).data;
-                
-                // Process data
-                processData();
-                
-            } catch (error) {
-                console.error('Error loading data:', error);
-                showError('Failed to load data. Please refresh the page.');
-            }
-        }
-
-        // Process data
-        function processData() {
-            // Clean country data
-            countryData.forEach(d => {
-                d.eletrified_rail_length_clean = parseInt(String(d.eletrified_rail_length).replace(/,/g, '')) || 0;
-                d.total_length_clean = parseInt(String(d.total_length).replace(/,/g, '')) || 0;
-                d.passenger_km_clean = parseInt(String(d.passenger_km).replace(/,/g, '')) || 0;
-                d.electrification_pct = parseInt(String(d.pecentage_electried_length).replace('%', '')) || 0;
-            });
-        }
-
-        // Initialize map
-        function initializeMap() {
-            const width = document.getElementById('europe-map').clientWidth;
-            const height = 600;
-            
-            const svg = d3.select('#europe-map')
-                .append('svg')
-                .attr('width', width)
-                .attr('height', height);
-            
-            const projection = d3.geoMercator()
-                .center([10, 52])
-                .scale(width / 1.5)
-                .translate([width / 2, height / 2]);
-            
-            const path = d3.geoPath().projection(projection);
-            
-            // Color scale based on electrification
-            const colorScale = d3.scaleSequential()
-                .domain([0, 100])
-                .interpolator(d3.interpolateGreens);
-            
-            // Load Europe topology
-            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
-                .then(function(world) {
-                    const countries = topojson.feature(world, world.objects.countries);
-                    
-                    // Create country data map
-                    const dataMap = new Map();
-                    countryData.forEach(d => {
-                        dataMap.set(d.country, d);
-                    });
-                    
-                    // Draw countries
-                    svg.selectAll('.country')
-                        .data(countries.features)
-                        .enter()
-                        .append('path')
-                        .attr('class', 'country')
-                        .attr('d', path)
-                        .style('fill', d => {
-                            const countryName = d.properties.name;
-                            const data = dataMap.get(countryName);
-                            return data ? colorScale(data.electrification_pct) : '#1a2332';
-                        })
-                        .on('mouseover', function(event, d) {
-                            showTooltip(event, d);
-                        })
-                        .on('mouseout', hideTooltip)
-                        .on('click', function(event, d) {
-                            showCountryDetails(d);
-                        });
-                });
-        }
-
-        // Tooltip functions
-        function showTooltip(event, data) {
-            const tooltip = document.querySelector('.tooltip');
-            const countryInfo = countryData.find(c => c.country === data.properties.name);
-            
-            if (countryInfo) {
-                tooltip.innerHTML = `
-                    <strong>${data.properties.name}</strong><br>
-                    Electrification: ${countryInfo.electrification_pct}%<br>
-                    Network: ${countryInfo.total_length_clean.toLocaleString()} km<br>
-                    Passengers: ${countryInfo.passenger_km_clean.toLocaleString()}M km
-                `;
-                tooltip.style.left = event.pageX + 10 + 'px';
-                tooltip.style.top = event.pageY - 10 + 'px';
-                tooltip.classList.add('active');
-            }
-        }
-
-        function hideTooltip() {
-            document.querySelector('.tooltip').classList.remove('active');
-        }
-
-        // Country details panel
-        function showCountryDetails(countryFeature) {
-            const panel = document.querySelector('.country-info-panel');
-            const details = document.getElementById('country-details');
-            const countryInfo = countryData.find(c => c.country === countryFeature.properties.name);
-            
-            if (countryInfo) {
-                details.innerHTML = `
-                    <h2>${countryInfo.country}</h2>
-                    <div class="country-stats" style="margin-top: 2rem;">
-                        <div class="route-stat-card">
-                            <div class="extreme-value">${countryInfo.electrification_pct}%</div>
-                            <div class="extreme-label">Electrified</div>
-                        </div>
-                        <div class="route-stat-card">
-                            <div class="extreme-value">${countryInfo.total_length_clean.toLocaleString()}</div>
-                            <div class="extreme-label">Total km</div>
-                        </div>
-                        <div class="route-stat-card">
-                            <div class="extreme-value">${countryInfo.passenger_km_clean.toLocaleString()}</div>
-                            <div class="extreme-label">Million passenger-km</div>
-                        </div>
-                    </div>
-                    <h3 style="margin-top: 2rem; color: #4ac77d;">Operators</h3>
-                    <div class="operator-list">
-                        ${getCountryOperators(countryInfo.country)}
-                    </div>
-                `;
-                panel.classList.add('active');
-            }
-        }
-
-        function closeCountryPanel() {
-            document.querySelector('.country-info-panel').classList.remove('active');
-        }
-
-        function getCountryOperators(country) {
-            // This would be populated from the operators data
-            return '<p style="color: #a0aec0;">Loading operator information...</p>';
-        }
-
-        // Journey planner functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add journey planner interactions
-            const journeyForm = document.querySelector('.journey-form');
-            if (journeyForm) {
-                journeyForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    // Implement journey search
-                    showJourneyResults();
-                });
-            }
-        });
-
-        function showJourneyResults() {
-            const results = document.querySelector('.journey-results');
-            if (results) {
-                results.innerHTML = `
-                    <div class="journey-option">
-                        <div>
-                            <h4 style="color: #4ac77d; margin-bottom: 0.5rem;">Fastest Option</h4>
-                            <p>TGV via SNCF - 2h 15min</p>
-                            <div class="features-grid" style="margin-top: 0.5rem;">
-                                <div class="feature-badge">320 km/h</div>
-                                <div class="feature-badge">€89</div>
-                                <div class="feature-badge">WiFi</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <button class="nav-tab" style="padding: 0.5rem 1.5rem;">Book Now</button>
-                        </div>
-                    </div>
-                    <div class="journey-option">
-                        <div>
-                            <h4 style="color: #4ac77d; margin-bottom: 0.5rem;">Best Value</h4>
-                            <p>FlixTrain - 8h 30min</p>
-                            <div class="features-grid" style="margin-top: 0.5rem;">
-                                <div class="feature-badge">120 km/h</div>
-                                <div class="feature-badge">€29</div>
-                                <div class="feature-badge">Power outlets</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <button class="nav-tab" style="padding: 0.5rem 1.5rem;">Book Now</button>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function showError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error';
-            errorDiv.textContent = message;
-            document.body.appendChild(errorDiv);
-        }
-
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-        // Parallax effect for hero section
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            if (hero) {
-                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-            }
-        });
-
-        // Initialize on load
-        window.addEventListener('load', loadData);
-    </script>
-</body>
-</html>Average Electrification</div>
-                </div>
             </div>
         </div>
     </section>
@@ -1042,6 +769,7 @@
                             <div class="feature-badge">Catering</div>
                         </div>
                     </div>
+                    <button class="btn-primary">Book Now</button>
                 </div>
 
                 <div class="operator-card">
@@ -1064,6 +792,7 @@
                             </div>
                         </div>
                     </div>
+                    <button class="btn-primary">Book Now</button>
                 </div>
 
                 <div class="operator-card">
@@ -1086,6 +815,7 @@
                             </div>
                         </div>
                     </div>
+                    <button class="btn-primary">Book Now</button>
                 </div>
             </div>
         </div>
@@ -1118,6 +848,10 @@
                             <option>Most Scenic</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn-primary">Search Routes</button>
+                    </div>
                 </form>
 
                 <div class="journey-results">
@@ -1142,4 +876,45 @@
             <div class="route-stats">
                 <div class="route-stat-card">
                     <div class="extreme-value">52.9%</div>
-                    <div class="extreme-label">
+                    <div class="extreme-label">Average Electrification</div>
+                </div>
+                <div class="route-stat-card">
+                    <div class="extreme-value">7.5x</div>
+                    <div class="extreme-label">Less CO₂ than Flying</div>
+                </div>
+                <div class="route-stat-card">
+                    <div class="extreme-value">4x</div>
+                    <div class="extreme-label">Less CO₂ than Driving</div>
+                </div>
+                <div class="route-stat-card">
+                    <div class="extreme-value">100%</div>
+                    <div class="extreme-label">Swiss Renewable Energy</div>
+                </div>
+            </div>
+
+            <div class="extremes-grid">
+                <div class="extreme-card">
+                    <div class="extreme-icon">🇨🇭</div>
+                    <div class="extreme-value">100%</div>
+                    <div class="extreme-label">Switzerland</div>
+                    <div class="extreme-detail">Fully electrified network powered by renewable energy</div>
+                </div>
+                <div class="extreme-card">
+                    <div class="extreme-icon">🇳🇱</div>
+                    <div class="extreme-value">100%</div>
+                    <div class="extreme-label">Netherlands</div>
+                    <div class="extreme-detail">All electric trains run on wind power since 2017</div>
+                </div>
+                <div class="extreme-card">
+                    <div class="extreme-icon">🌙</div>
+                    <div class="extreme-value">Growing</div>
+                    <div class="extreme-label">Night Trains</div>
+                    <div class="extreme-detail">Revival of overnight services as eco-friendly alternative to flights</div>
+                </div>
+            </div>
+
+            <div class="fun-fact">
+                <strong>Green fact:</strong> A single high-speed train can replace up to 500 car trips or 3 short-haul flights, 
+                making rail the most sustainable way to cross Europe!
+            </div>
+        </div>
