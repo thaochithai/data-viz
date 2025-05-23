@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>European Railway Data Dashboard</title>
+    <title>The Great European Rail Adventure - An Interactive Journey</title>
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5/papaparse.min.js"></script>
@@ -16,1427 +16,1132 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f0f7f4;
-            color: #333;
+            background-color: #0a0e1a;
+            color: #e0e6ed;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .header {
-            background: url('header/heading_2.png') no-repeat center center;
-            color: white;
-            text-align: left;
+        /* Hero Section */
+        .hero {
             position: relative;
-            overflow: hidden;
-            min-height: 300px;
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            align-items: flex-start;
-            padding-left: 3rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a2332 100%);
+            overflow: hidden;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(45, 159, 93, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
         }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            padding: 2rem;
+            max-width: 900px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #2d9f5d 0%, #4ac77d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: #a0aec0;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-20px); }
+            60% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .nav-tabs {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 2rem;
-            background: white;
-            padding: 0.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
             overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
         }
 
         .nav-tab {
             background: none;
-            border: none;
+            border: 2px solid transparent;
             padding: 0.75rem 1.5rem;
-            border-radius: 8px;
+            border-radius: 30px;
             cursor: pointer;
             font-size: 1rem;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #a0aec0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
-        }
-
-        .nav-tab:hover {
-            background: #f0f7f4;
-            color: #237644;
-        }
-
-        .nav-tab.active {
-            background: #237644;
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .chart-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .chart-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #237644;
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .stat-card h3 {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .stat-card .value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #237644;
-        }
-
-        #europe-map {
-            width: 100%;
-            height: 500px;
-            background: #f0f7f4;
-            border-radius: 8px;
-        }
-
-        .country {
-            fill: #bbebd3;
-            stroke: #237644;
-            stroke-width: 0.5;
-            transition: fill 0.3s ease;
-        }
-
-        .country:hover {
-            fill: #237644;
-        }
-
-        .tooltip {
-            position: absolute;
-            padding: 0.75rem;
-            background: rgba(35, 118, 68, 0.95);
-            color: white;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            pointer-events: none;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .selected-country-info {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-top: 2rem;
-            display: none;
-        }
-
-        .selected-country-info h3 {
-            font-size: 1.5rem;
-            color: #237644;
-            margin-bottom: 1rem;
-        }
-
-        .country-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .country-stat {
-            text-align: center;
-        }
-
-        .country-stat h4 {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .country-stat .value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #237644;
-        }
-
-        .country-stat small {
-            font-size: 0.8rem;
-            color: #999;
-        }
-
-        .policy-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            border: 2px solid #e0e0e0;
-            transition: all 0.3s ease;
-        }
-
-        .policy-card:hover {
-            border-color: #237644;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .policy-card.excellent {
-            border-color: #237644;
-            background: linear-gradient(135deg, #f0f7f4 0%, #e6f4ea 100%);
-        }
-
-        .policy-card h3 {
-            color: #237644;
-            margin-bottom: 0.5rem;
-        }
-
-        .superstar-card {
-            background: linear-gradient(135deg, #237644 0%, #2d9f5d 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease;
-        }
-
-        .superstar-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .superstar-card h3 {
-            margin-bottom: 0.5rem;
-        }
-
-        .superstar-score {
-            font-size: 2rem;
-            font-weight: 700;
-            background: white;
-            color: #237644;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-        }
-
-        .operator-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .operator-details span {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
-
-        .route-comparison {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .route-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        .route-card.intercity::before {
+        .nav-tab::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #237644;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(45, 159, 93, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
         }
 
-        .route-card.international::before {
+        .nav-tab:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .nav-tab:hover {
+            color: #4ac77d;
+            border-color: #4ac77d;
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #2d9f5d 0%, #4ac77d 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Content Sections */
+        .content-section {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #4ac77d 0%, #2d9f5d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            font-size: 1.3rem;
+            color: #a0aec0;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Extremes Section */
+        .extremes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .extreme-card {
+            background: linear-gradient(135deg, rgba(26, 35, 50, 0.8) 0%, rgba(26, 35, 50, 0.4) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .extreme-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #2d9f5d;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(74, 199, 125, 0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
         }
 
-        .route-card h3 {
-            color: #237644;
+        .extreme-card:hover::before {
+            opacity: 1;
+        }
+
+        .extreme-card:hover {
+            transform: translateY(-5px);
+            border-color: #4ac77d;
+            box-shadow: 0 10px 30px rgba(74, 199, 125, 0.2);
+        }
+
+        .extreme-icon {
+            font-size: 3rem;
             margin-bottom: 1rem;
         }
 
-        .route-card .value {
-            font-size: 3rem;
-            font-weight: 700;
-            color: #237644;
+        .extreme-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #4ac77d;
             margin-bottom: 0.5rem;
         }
 
-        .best-routes-table {
+        .extreme-label {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            margin-bottom: 0.5rem;
+        }
+
+        .extreme-detail {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        /* Map Section */
+        .map-container {
+            background: rgba(26, 35, 50, 0.4);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #europe-map {
             width: 100%;
-            border-collapse: collapse;
+            height: 600px;
+            border-radius: 12px;
+            background: rgba(10, 14, 26, 0.5);
         }
 
-        .best-routes-table th,
-        .best-routes-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+        .country {
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 0.5;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .best-routes-table th {
-            background: #f0f7f4;
-            color: #237644;
-            font-weight: 600;
+        .country:hover {
+            stroke: #4ac77d;
+            stroke-width: 2;
+            filter: brightness(1.2);
         }
 
-        .best-routes-table tr:hover {
-            background: #f8f9fa;
+        /* Country Info Panel */
+        .country-info-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            z-index: 200;
         }
 
-        .loading {
+        .country-info-panel.active {
+            right: 0;
+        }
+
+        .close-panel {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-panel:hover {
+            color: #4ac77d;
+        }
+
+        /* Operator Cards */
+        .operator-showcase {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .operator-card {
+            background: linear-gradient(135deg, rgba(26, 35, 50, 0.8) 0%, rgba(26, 35, 50, 0.4) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 2rem;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .operator-card:hover {
+            transform: translateX(10px);
+            border-color: #4ac77d;
+            box-shadow: 0 10px 30px rgba(74, 199, 125, 0.2);
+        }
+
+        .operator-rank {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #2d9f5d;
+            opacity: 0.3;
+        }
+
+        .operator-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #4ac77d;
+        }
+
+        .operator-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .operator-stat {
             text-align: center;
-            padding: 3rem;
+        }
+
+        .operator-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4ac77d;
+        }
+
+        .operator-stat-label {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-badge {
+            background: rgba(74, 199, 125, 0.1);
+            border: 1px solid rgba(74, 199, 125, 0.3);
+            padding: 0.5rem;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #4ac77d;
+        }
+
+        /* Route Analysis */
+        .route-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .route-stat-card {
+            background: linear-gradient(135deg, rgba(74, 199, 125, 0.1) 0%, rgba(45, 159, 93, 0.05) 100%);
+            border: 1px solid rgba(74, 199, 125, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .route-stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(74, 199, 125, 0.3);
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: absolute;
+            padding: 1rem;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(74, 199, 125, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip.active {
+            opacity: 1;
+        }
+
+        /* Loading and Error States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
             font-size: 1.2rem;
-            color: #666;
+            color: #a0aec0;
+        }
+
+        .loading::before {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(74, 199, 125, 0.3);
+            border-top-color: #4ac77d;
+            border-radius: 50%;
+            margin-right: 1rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .error {
-            background: #fee;
-            color: #c00;
-            padding: 1rem;
-            border-radius: 8px;
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #fc8181;
+            padding: 1.5rem;
+            border-radius: 12px;
             margin: 2rem 0;
             text-align: center;
         }
 
-        .chart-bar {
-            fill: #bbebd3;
-            stroke: #237644;
-            stroke-width: 1;
-            transition: fill 0.3s ease;
-        }
-
-        .chart-bar:hover {
-            fill: #237644;
-        }
-
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .header h1 {
-                font-size: 2rem;
+            .hero h1 {
+                letter-spacing: -1px;
             }
 
             .nav-tabs {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                padding: 1rem;
             }
 
-            .stat-grid {
-                grid-template-columns: 1fr;
+            .country-info-panel {
+                width: 100%;
+                right: -100%;
             }
 
-            .route-comparison {
+            .operator-card {
                 grid-template-columns: 1fr;
+                text-align: center;
             }
+
+            .operator-rank {
+                font-size: 3rem;
+            }
+        }
+
+        /* Journey Planner */
+        .journey-planner {
+            background: linear-gradient(135deg, rgba(26, 35, 50, 0.8) 0%, rgba(26, 35, 50, 0.4) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+        }
+
+        .journey-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            background: rgba(10, 14, 26, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4ac77d;
+            box-shadow: 0 0 0 3px rgba(74, 199, 125, 0.1);
+        }
+
+        .journey-results {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .journey-option {
+            background: rgba(10, 14, 26, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .journey-option:hover {
+            border-color: #4ac77d;
+            transform: translateX(5px);
+        }
+
+        /* Fun Facts */
+        .fun-fact {
+            background: linear-gradient(135deg, rgba(74, 199, 125, 0.1) 0%, transparent 100%);
+            border-left: 4px solid #4ac77d;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 15px 15px 0;
+            font-style: italic;
+            color: #a0aec0;
+        }
+
+        .fun-fact strong {
+            color: #4ac77d;
+            font-style: normal;
         }
     </style>
 </head>
-</head>
 <body>
-    <div class="header">
-        <h1>What is it really like to travel<br>by train in Europe?</h1>
-        <p>Comprehensive analysis of European train operators,<br>routes, and passenger experience</p>
-    </div>
-        
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('europe-map-tab', event)">Europe Map</button>
-            <button class="nav-tab" onclick="showTab('operators-by-country', event)">Operators by Country</button>
-            <button class="nav-tab" onclick="showTab('refund-policies', event)">Refund & Cancellation</button>
-            <button class="nav-tab" onclick="showTab('superstar-operators', event)">Top 5 Superstar Operators</button>
-            <button class="nav-tab" onclick="showTab('route-comparison', event)">Route Comparison</button>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>The Great European Rail Adventure</h1>
+            <p class="hero-subtitle">From 19 km/h mountain railways to 274 km/h speed demons</p>
+            <div class="scroll-indicator">
+                <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+                    <path d="M15 20L10 15L11.4 13.6L15 17.2L18.6 13.6L20 15L15 20Z" fill="#4ac77d"/>
+                </svg>
+            </div>
         </div>
+    </section>
 
-        <div id="europe-map-tab" class="tab-content active">
-            <div class="chart-container">
-                <h2 class="chart-title">European Railway Network Overview</h2>
-                <p style="text-align: center; margin-bottom: 1rem; color: #666;">
-                    Click on any country to see detailed railway statistics. Map shows available countries from dataset.
-                </p>
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('extremes', event)">🚄 The Extremes</button>
+            <button class="nav-tab" onclick="showTab('europe-map', event)">🗺️ Rail Nations</button>
+            <button class="nav-tab" onclick="showTab('operators', event)">⭐ Top Operators</button>
+            <button class="nav-tab" onclick="showTab('journey-planner', event)">🎯 Plan Journey</button>
+            <button class="nav-tab" onclick="showTab('sustainability', event)">🌱 Green Impact</button>
+        </div>
+    </nav>
+
+    <!-- The Extremes Section -->
+    <section id="extremes" class="content-section tab-content active">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Europe's Railway Extremes</h2>
+                <p class="section-subtitle">Where speed meets tradition, and luxury clashes with value</p>
+            </div>
+
+            <div class="extremes-grid">
+                <div class="extreme-card">
+                    <div class="extreme-icon">🏎️</div>
+                    <div class="extreme-value">274 km/h</div>
+                    <div class="extreme-label">Speed Champion</div>
+                    <div class="extreme-detail">Ouigo's Paris-Bordeaux route blazes through France at TGV speeds</div>
+                </div>
+
+                <div class="extreme-card">
+                    <div class="extreme-icon">🐌</div>
+                    <div class="extreme-value">19 km/h</div>
+                    <div class="extreme-label">Scenic Crawler</div>
+                    <div class="extreme-detail">Greece's Diakopto-Kalavryta rack railway - slow is the new fast</div>
+                </div>
+
+                <div class="extreme-card">
+                    <div class="extreme-icon">💸</div>
+                    <div class="extreme-value">€1.04/km</div>
+                    <div class="extreme-label">Premium Price</div>
+                    <div class="extreme-detail">London-Milton Keynes - where your wallet travels light</div>
+                </div>
+
+                <div class="extreme-card">
+                    <div class="extreme-icon">🎉</div>
+                    <div class="extreme-value">€0.01/km</div>
+                    <div class="extreme-label">Best Value</div>
+                    <div class="extreme-detail">Berlin-Cologne - German efficiency at its finest</div>
+                </div>
+
+                <div class="extreme-card">
+                    <div class="extreme-icon">⚡</div>
+                    <div class="extreme-value">100%</div>
+                    <div class="extreme-label">Fully Electric</div>
+                    <div class="extreme-detail">Switzerland - where every train runs on clean energy</div>
+                </div>
+
+                <div class="extreme-card">
+                    <div class="extreme-icon">⏰</div>
+                    <div class="extreme-value">90%</div>
+                    <div class="extreme-label">Punctuality King</div>
+                    <div class="extreme-detail">SBB - Swiss precision isn't just for watches</div>
+                </div>
+            </div>
+
+            <div class="fun-fact">
+                <strong>Did you know?</strong> The speed difference between Europe's fastest and slowest trains is 255 km/h - 
+                that's like comparing a Formula 1 car to a leisurely bicycle ride!
+            </div>
+        </div>
+    </section>
+
+    <!-- Europe Map Section -->
+    <section id="europe-map" class="content-section tab-content">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Rail Nations of Europe</h2>
+                <p class="section-subtitle">Click any country to explore its railway story</p>
+            </div>
+
+            <div class="map-container">
                 <div id="europe-map"></div>
             </div>
 
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <h3>Total Countries</h3>
-                    <div class="value" id="map-total-countries">-</div>
+            <div class="route-stats">
+                <div class="route-stat-card">
+                    <div class="extreme-value">30</div>
+                    <div class="extreme-label">Countries Connected</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Total Railway Length</h3>
-                    <div class="value" id="map-total-length">-</div>
+                <div class="route-stat-card">
+                    <div class="extreme-value">254</div>
+                    <div class="extreme-label">International Routes</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Average Electrification</h3>
-                    <div class="value" id="map-avg-electrification">-</div>
+                <div class="route-stat-card">
+                    <div class="extreme-value">52.9%</div>
+                    <div class="extreme-label">Average Electrification</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Most Electrified</h3>
-                    <div class="value" id="map-most-electrified">-</div>
+                <div class="route-stat-card">
+                    <div class="extreme-value">7.5x</div>
+                    <div class="extreme-label">Less CO₂ than Flying</div>
+                </div>
+                <div class="route-stat-card">
+                    <div class="extreme-value">4x</div>
+                    <div class="extreme-label">Less CO₂ than Driving</div>
                 </div>
             </div>
 
-            <div class="selected-country-info" id="selected-country-info">
-                <h3 id="selected-country-name">Select a country</h3>
-                <div class="country-stats">
-                    <div class="country-stat">
-                        <h4>Total Railway Length</h4>
-                        <div class="value" id="selected-total-length">-</div>
-                        <small>kilometers</small>
-                    </div>
-                    <div class="country-stat">
-                        <h4>Electrified Length</h4>
-                        <div class="value" id="selected-electrified-length">-</div>
-                        <small>kilometers</small>
-                    </div>
-                    <div class="country-stat">
-                        <h4>% Electrified</h4>
-                        <div class="value" id="selected-electrified-percent">-</div>
-                        <small>of total network</small>
-                    </div>
-                    <div class="country-stat">
-                        <h4>Annual Passengers</h4>
-                        <div class="value" id="selected-passengers">-</div>
-                        <small>million passenger-km</small>
-                    </div>
+            <div class="extremes-grid">
+                <div class="extreme-card">
+                    <div class="extreme-icon">🇨🇭</div>
+                    <div class="extreme-value">100%</div>
+                    <div class="extreme-label">Switzerland</div>
+                    <div class="extreme-detail">Fully electrified network powered by renewable energy</div>
                 </div>
+                <div class="extreme-card">
+                    <div class="extreme-icon">🇳🇱</div>
+                    <div class="extreme-value">100%</div>
+                    <div class="extreme-label">Netherlands</div>
+                    <div class="extreme-detail">All electric trains run on wind power since 2017</div>
+                </div>
+                <div class="extreme-card">
+                    <div class="extreme-icon">🌙</div>
+                    <div class="extreme-value">Growing</div>
+                    <div class="extreme-label">Night Trains</div>
+                    <div class="extreme-detail">Revival of overnight services as eco-friendly alternative to flights</div>
+                </div>
+            </div>
+
+            <div class="fun-fact">
+                <strong>Climate win:</strong> If just 10% of European flights under 1000km switched to rail, 
+                we'd save 1.5 million tonnes of CO₂ annually - equivalent to removing 750,000 cars from the roads!
             </div>
         </div>
+    </section>
 
-        <div id="operators-by-country" class="tab-content">
-            <div class="chart-container">
-                <h2 class="chart-title">Operators by Country</h2>
-                <div id="operators-by-country-chart"></div>
-            </div>
-
-            <div class="chart-container">
-                <h2 class="chart-title">Punctuality vs Delay Across Operators</h2>
-                <div id="punctuality-delay-chart"></div>
-            </div>
-
-            <div class="chart-container">
-                <h2 class="chart-title">Average Speed by Operator</h2>
-                <div id="average-speed-chart"></div>
-            </div>
-
-            <div class="chart-container">
-                <h2 class="chart-title">Service Amenities Matrix</h2>
-                <div id="service-amenities-chart"></div>
-            </div>
-            
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <h3>Total Countries</h3>
-                    <div class="value" id="total-countries">-</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Total Operators</h3>
-                    <div class="value" id="total-operators">-</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Average Operators per Country</h3>
-                    <div class="value" id="avg-operators">-</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Country with Most Operators</h3>
-                    <div class="value" id="top-country">-</div>
-                </div>
-            </div>
-
-            <div class="chart-container">
-                <h2 class="chart-title">Detailed Operators by Country</h2>
-                <div id="country-operators-detail"></div>
-            </div>
-        </div>
-
-        <div id="refund-policies" class="tab-content">
-            <div class="chart-container">
-                <h2 class="chart-title">Best Refund & Cancellation Policies</h2>
-                <div id="policy-rankings"></div>
-            </div>
-
-            <div class="chart-container">
-                <h2 class="chart-title">Policy Comparison Metrics</h2>
-                <div id="policy-metrics-chart"></div>
-            </div>
-        </div>
-
-        <div id="superstar-operators" class="tab-content">
-            <div class="chart-container">
-                <h2 class="chart-title">Top 5 Superstar Operators</h2>
-                <p style="text-align: center; margin-bottom: 2rem; color: #666;">
-                    Based on: Speed, WiFi, electricity plug, catering, refund policies, and flexibility
-                </p>
-                <div id="superstar-list"></div>
-            </div>
-
-            <div class="chart-container">
-                <h2 class="chart-title">Superstar Scoring Methodology</h2>
-                <div id="scoring-methodology"></div>
-            </div>
-        </div>
-
-        <div id="route-comparison" class="tab-content">
-            <div class="route-comparison">
-                <div class="route-card intercity">
-                    <h3>Intercity Routes</h3>
-                    <div class="value" id="intercity-count">-</div>
-                    <p>Total Routes</p>
-                    <div style="margin-top: 1rem;">
-                        <strong>Avg Price per km: €<span id="intercity-avg-price">-</span></strong><br>
-                        <strong>Avg Speed: <span id="intercity-avg-speed">-</span> km/h</strong>
-                    </div>
-                </div>
-                
-                <div class="route-card international">
-                    <h3>International Routes</h3>
-                    <div class="value" id="international-count">-</div>
-                    <p>Total Routes</p>
-                    <div style="margin-top: 1rem;">
-                        <strong>Avg Price per km: €<span id="international-avg-price">-</span></strong><br>
-                        <strong>Avg Speed: <span id="international-avg-speed">-</span> km/h</strong>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chart-container">
-                <h2 class="chart-title">Price per km Comparison by Route Type</h2>
-                <div id="price-per-km-chart"></div>
-            </div>
-
-            <div class="chart-container">
-                <h2 class="chart-title">Best Value Routes (Lowest Price per km)</h2>
-                <table class="best-routes-table" id="best-routes-table">
-                    <thead>
-                        <tr>
-                            <th>Route</th>
-                            <th>Operator</th>
-                            <th>Type</th>
-                            <th>Distance (km)</th>
-                            <th>Price (€)</th>
-                            <th>Price per km (€)</th>
-                            <th>Speed (km/h)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="best-routes-body">
-                    </tbody>
-                </table>
-            </div>
+    <!-- Country Info Panel -->
+    <div class="country-info-panel">
+        <button class="close-panel" onclick="closeCountryPanel()">×</button>
+        <div id="country-details">
+            <!-- Country details will be populated here -->
         </div>
     </div>
 
-    <div class="loading" id="loading">Loading data...</div>
-    <div class="error" id="error" style="display: none;"></div>
+    <!-- Tooltip -->
+    <div class="tooltip"></div>
 
     <script>
-        let allData = {
-            countries: [],
-            operators: [],
-            routes: [],
-            trainOperators: []
-        };
+        // Global variables
+        let countryData = [];
+        let operatorData = [];
+        let routeData = [];
+        let currentTab = 'extremes';
 
-        // Utility function to safely parse numbers
-        function safeParseFloat(value) {
-            if (value === null || value === undefined || value === '') return 0;
-            const parsed = parseFloat(String(value).replace(/[^\d.-]/g, ''));
-            return isNaN(parsed) ? 0 : parsed;
+        // Tab switching
+        function showTab(tabId, event) {
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            currentTab = tabId;
+            
+            // Initialize specific tab content
+            if (tabId === 'europe-map' && !document.querySelector('#europe-map svg')) {
+                initializeMap();
+            }
         }
 
-        function safeParseInt(value) {
-            if (value === null || value === undefined || value === '') return 0;
-            const parsed = parseInt(String(value).replace(/[^\d-]/g, ''));
-            return isNaN(parsed) ? 0 : parsed;
-        }
-
-        // Load CSV data using Papa Parse
+        // Load data
         async function loadData() {
             try {
-                const files = [
-                    'country_passenger_km_train_length.csv',
-                    'operators.csv',
-                    'route_breakdown.csv',
-                    'operators_comparison.csv'
-                ];
-
-                const responses = await Promise.all(files.map(file => 
-                    fetch(file).catch(err => {
-                        console.warn(`Failed to load ${file}:`, err);
-                        return { ok: false, text: () => '' };
-                    })
-                ));
-
-                const texts = await Promise.all(responses.map(response => 
-                    response.ok ? response.text() : ''
-                ));
-
-                // Parse CSV data with error handling
-                allData.countries = texts[0] ? Papa.parse(texts[0], { header: true, dynamicTyping: true }).data : [];
-                allData.operators = texts[1] ? Papa.parse(texts[1], { header: true, dynamicTyping: true }).data : [];
-                allData.routes = texts[2] ? Papa.parse(texts[2], { header: true, dynamicTyping: true }).data : [];
-                allData.trainOperators = texts[3] ? Papa.parse(texts[3], { header: true, dynamicTyping: true }).data : [];
-
-                // Clean the data and fix column names
-                allData.countries = allData.countries.filter(d => d.country && d.country.trim()).map(d => ({
-                    country: d.country.trim(),
-                    electrified_rail_length: safeParseFloat(d.eletrified_rail_length || d.electrified_rail_length),
-                    total_length: safeParseFloat(d.total_length),
-                    percentage_electrified: safeParseFloat(d.pecentage_electried_length || d.percentage_electrified_length),
-                    passenger_km: safeParseFloat(d.passenger_km)
-                }));
-
-                allData.operators = allData.operators.filter(d => d.operator && d.operator.trim());
-                allData.routes = allData.routes.filter(d => d.operator && d.operator.trim()).map(d => ({
-                    ...d,
-                    price_eur: safeParseFloat(d[' price_eur '] || d.price_eur),
-                    price_per_km: safeParseFloat(d[' price_per_km '] || d.price_per_km),
-                    distance_km: safeParseFloat(d.distance_km),
-                    speed_km_per_hour: safeParseFloat(d.speed_km_per_hour),
-                    duration_min: safeParseInt(d.duration_min)
-                }));
-
-                allData.trainOperators = allData.trainOperators.filter(d => d.operator && d.operator.trim()).map(d => ({
-                    ...d,
-                    average_speed: safeParseFloat(d.average_speed),
-                    delay_above_min: safeParseFloat(d.delay_above_min),
-                    can_book_before_month: safeParseInt(d.can_book_before_month)
-                }));
-
-                console.log('Data loaded:', allData);
+                // Load country data
+                const countryResponse = await fetch('country_passenger_km_train_length.csv');
+                const countryText = await countryResponse.text();
+                countryData = Papa.parse(countryText, { header: true, dynamicTyping: true }).data;
                 
-                await initializeVisualization();
-                document.getElementById('loading').style.display = 'none';
+                // Load operator data
+                const operatorResponse = await fetch('operators_comparison.csv');
+                const operatorText = await operatorResponse.text();
+                operatorData = Papa.parse(operatorText, { header: true, dynamicTyping: true }).data;
+                
+                // Load route data
+                const routeResponse = await fetch('route_breakdown.csv');
+                const routeText = await routeResponse.text();
+                routeData = Papa.parse(routeText, { header: true, dynamicTyping: true }).data;
+                
+                // Process data
+                processData();
+                
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('error').textContent = `Error loading data: ${error.message}`;
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('loading').style.display = 'none';
+                showError('Failed to load data. Please refresh the page.');
             }
         }
 
-        // Show/hide tabs
-        function showTab(tabName, event) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
+        // Process data
+        function processData() {
+            // Clean country data
+            countryData.forEach(d => {
+                d.eletrified_rail_length_clean = parseInt(String(d.eletrified_rail_length).replace(/,/g, '')) || 0;
+                d.total_length_clean = parseInt(String(d.total_length).replace(/,/g, '')) || 0;
+                d.passenger_km_clean = parseInt(String(d.passenger_km).replace(/,/g, '')) || 0;
+                d.electrification_pct = parseInt(String(d.pecentage_electried_length).replace('%', '')) || 0;
             });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            document.getElementById(tabName).classList.add('active');
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
-
-            // Initialize specific visualizations when tabs are shown
-            if (tabName === 'operators-by-country' && allData.operators.length > 0) {
-                createOperatorsByCountryChart();
-                createPunctualityChart();
-                createSpeedChart();
-                createAmenitiesChart();
-            }
         }
 
-        async function initializeVisualization() {
-            createMapVisualization();
-            createMapStatistics();
-            if (allData.operators.length > 0) {
-                createOperatorsByCountryChart();
-                createRefundPolicyAnalysis();
-                createSuperstarOperators();
-                createRouteComparison();
-            }
-        }
-
-        // Europe Map Functions
-        function createMapVisualization() {
-            const mapContainer = document.getElementById('europe-map');
-            mapContainer.innerHTML = '';
+        // Initialize map
+        function initializeMap() {
+            const width = document.getElementById('europe-map').clientWidth;
+            const height = 600;
             
-            if (allData.countries.length === 0) {
-                mapContainer.innerHTML = `
-                    <div style="display: flex; justify-content: center; align-items: center; height: 500px; background: #f8f9fa; border-radius: 8px;">
-                        <div style="text-align: center; color: #666;">
-                            <h3>Country Data Visualization</h3>
-                            <p>Click on a country name below to see details</p>
-                        </div>
-                    </div>
-                `;
-                
-                // Create a simple country list as fallback
-                const countryList = document.createElement('div');
-                countryList.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;';
-                
-                allData.countries.forEach(country => {
-                    const countryCard = document.createElement('div');
-                    countryCard.style.cssText = 'background: white; padding: 1rem; border-radius: 8px; cursor: pointer; border: 2px solid #e0e0e0; transition: border-color 0.3s;';
-                    countryCard.innerHTML = `
-                        <h4 style="color: #237644; margin-bottom: 0.5rem;">${country.country}</h4>
-                        <p style="font-size: 0.9rem; color: #666;">Length: ${country.total_length.toLocaleString()} km</p>
-                        <p style="font-size: 0.9rem; color: #666;">Electrified: ${country.percentage_electrified.toFixed(1)}%</p>
-                    `;
-                    countryCard.addEventListener('click', () => selectCountry(country));
-                    countryCard.addEventListener('mouseenter', () => countryCard.style.borderColor = '#237644');
-                    countryCard.addEventListener('mouseleave', () => countryCard.style.borderColor = '#e0e0e0');
-                    countryList.appendChild(countryCard);
+            const svg = d3.select('#europe-map')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const projection = d3.geoMercator()
+                .center([10, 52])
+                .scale(width / 1.5)
+                .translate([width / 2, height / 2]);
+            
+            const path = d3.geoPath().projection(projection);
+            
+            // Color scale based on electrification
+            const colorScale = d3.scaleSequential()
+                .domain([0, 100])
+                .interpolator(d3.interpolateGreens);
+            
+            // Load Europe topology
+            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+                .then(function(world) {
+                    const countries = topojson.feature(world, world.objects.countries);
+                    
+                    // Create country data map
+                    const dataMap = new Map();
+                    countryData.forEach(d => {
+                        dataMap.set(d.country, d);
+                    });
+                    
+                    // Draw countries
+                    svg.selectAll('.country')
+                        .data(countries.features)
+                        .enter()
+                        .append('path')
+                        .attr('class', 'country')
+                        .attr('d', path)
+                        .style('fill', d => {
+                            const countryName = d.properties.name;
+                            const data = dataMap.get(countryName);
+                            return data ? colorScale(data.electrification_pct) : '#1a2332';
+                        })
+                        .on('mouseover', function(event, d) {
+                            showTooltip(event, d);
+                        })
+                        .on('mouseout', hideTooltip)
+                        .on('click', function(event, d) {
+                            showCountryDetails(d);
+                        });
                 });
-                
-                mapContainer.appendChild(countryList);
-                return;
-            }
         }
 
-        function selectCountry(countryInfo) {
-            const infoDiv = document.getElementById('selected-country-info');
-            infoDiv.style.display = 'block';
+        // Tooltip functions
+        function showTooltip(event, data) {
+            const tooltip = document.querySelector('.tooltip');
+            const countryInfo = countryData.find(c => c.country === data.properties.name);
             
-            document.getElementById('selected-country-name').textContent = countryInfo.country;
-            document.getElementById('selected-total-length').textContent = countryInfo.total_length.toLocaleString();
-            document.getElementById('selected-electrified-length').textContent = countryInfo.electrified_rail_length.toLocaleString();
-            document.getElementById('selected-electrified-percent').textContent = countryInfo.percentage_electrified.toFixed(1) + '%';
-            document.getElementById('selected-passengers').textContent = countryInfo.passenger_km.toLocaleString();
-        }
-
-        function createMapStatistics() {
-            if (!allData.countries || allData.countries.length === 0) {
-                return;
-            }
-
-            const totalCountries = allData.countries.length;
-            const totalLength = allData.countries.reduce((sum, d) => sum + d.total_length, 0);
-            const avgElectrification = allData.countries.reduce((sum, d) => sum + d.percentage_electrified, 0) / totalCountries;
-            const mostElectrified = allData.countries.reduce((max, d) => d.percentage_electrified > max.percentage_electrified ? d : max, allData.countries[0]);
-
-            document.getElementById('map-total-countries').textContent = totalCountries;
-            document.getElementById('map-total-length').textContent = Math.round(totalLength).toLocaleString() + ' km';
-            document.getElementById('map-avg-electrification').textContent = Math.round(avgElectrification) + '%';
-            document.getElementById('map-most-electrified').textContent = mostElectrified.country;
-        }
-
-        function createOperatorsByCountryChart() {
-            if (!allData.operators || allData.operators.length === 0) return;
-
-            // Count operators by country
-            const operatorsByCountry = d3.rollup(
-                allData.operators,
-                v => v.length,
-                d => d.country
-            );
-
-            const data = Array.from(operatorsByCountry, ([country, count]) => ({country, count}))
-                .sort((a, b) => b.count - a.count);
-
-            // Update stats
-            document.getElementById('total-countries').textContent = data.length;
-            document.getElementById('total-operators').textContent = allData.operators.length;
-            document.getElementById('avg-operators').textContent = (allData.operators.length / data.length).toFixed(1);
-            document.getElementById('top-country').textContent = data[0]?.country || '-';
-
-            // Create chart
-            const container = d3.select('#operators-by-country-chart');
-            container.selectAll('*').remove();
-            
-            const svg = container.append('svg')
-                .attr('width', '100%')
-                .attr('height', 400);
-
-            const margin = {top: 20, right: 30, bottom: 100, left: 60};
-            const width = 800 - margin.left - margin.right;
-            const height = 400 - margin.top - margin.bottom;
-
-            svg.attr('viewBox', `0 0 800 400`);
-
-            const g = svg.append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-
-            const x = d3.scaleBand()
-                .rangeRound([0, width])
-                .padding(0.1)
-                .domain(data.map(d => d.country));
-
-            const y = d3.scaleLinear()
-                .rangeRound([height, 0])
-                .domain([0, d3.max(data, d => d.count)]);
-
-            g.append('g')
-                .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll('text')
-                .style('text-anchor', 'end')
-                .attr('dx', '-.8em')
-                .attr('dy', '.15em')
-                .attr('transform', 'rotate(-45)');
-
-            g.append('g')
-                .call(d3.axisleft(y));
-
-            g.selectAll('.bar')
-                .data(data)
-                .enter().append('rect')
-                .attr('class', 'chart-bar')
-                .attr('x', d => x(d.country))
-                .attr('y', d => y(d.count))
-                .attr('width', x.bandwidth())
-                .attr('height', d => height - y(d.count));
-
-            // Add value labels on bars
-            g.selectAll('.bar-label')
-                .data(data)
-                .enter().append('text')
-                .attr('class', 'bar-label')
-                .attr('x', d => x(d.country) + x.bandwidth() / 2)
-                .attr('y', d => y(d.count) - 5)
-                .attr('text-anchor', 'middle')
-                .style('font-size', '12px')
-                .style('font-weight', '600')
-                .style('fill', '#237644')
-                .text(d => d.count);
-
-            // Create detailed operators list
-            const detailContainer = d3.select('#country-operators-detail');
-            detailContainer.selectAll('*').remove();
-            
-            data.forEach(({country, count}) => {
-                const countryOperators = allData.operators.filter(d => d.country === country);
-                const operatorList = countryOperators.map(d => d.operator).join(', ');
-                
-                detailContainer.append('div')
-                    .attr('class', 'policy-card')
-                    .html(`
-                        <h3>${country} (${count} operators)</h3>
-                        <p>${operatorList}</p>
-                    `);
-            });
-        }
-
-        function createPunctualityChart() {
-            if (!allData.trainOperators || allData.trainOperators.length === 0) return;
-
-            const punctualityData = allData.trainOperators
-                .filter(d => d.on_time_percentage && d.delay_above_min !== undefined)
-                .map(d => ({
-                    operator: d.operator,
-                    onTime: safeParseFloat(d.on_time_percentage.replace('%', '')),
-                    avgDelay: d.delay_above_min
-                }))
-                .sort((a, b) => b.onTime - a.onTime)
-                .slice(0, 15);
-
-            const container = d3.select('#punctuality-delay-chart');
-            container.selectAll('*').remove();
-            
-            const svg = container.append('svg')
-                .attr('width', '100%')
-                .attr('height', 400);
-
-            const margin = {top: 20, right: 30, bottom: 120, left: 60};
-            const width = 800 - margin.left - margin.right;
-            const height = 400 - margin.top - margin.bottom;
-
-            svg.attr('viewBox', `0 0 800 400`);
-
-            const g = svg.append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-
-            const x = d3.scaleBand()
-                .rangeRound([0, width])
-                .padding(0.1)
-                .domain(punctualityData.map(d => d.operator));
-
-            const y = d3.scaleLinear()
-                .rangeRound([height, 0])
-                .domain([0, 100]);
-
-            g.append('g')
-                .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll('text')
-                .style('text-anchor', 'end')
-                .attr('dx', '-.8em')
-                .attr('dy', '.15em')
-                .attr('transform', 'rotate(-45)');
-
-            g.append('g')
-                .call(d3.axisLeft(y))
-                .append('text')
-                .attr('transform', 'rotate(-90)')
-                .attr('y', 6)
-                .attr('dy', '0.71em')
-                .attr('text-anchor', 'end')
-                .text('On-time Percentage (%)');
-
-            g.selectAll('.bar')
-                .data(punctualityData)
-                .enter().append('rect')
-                .attr('class', 'chart-bar')
-                .attr('x', d => x(d.operator))
-                .attr('y', d => y(d.onTime))
-                .attr('width', x.bandwidth())
-                .attr('height', d => height - y(d.onTime));
-
-            g.selectAll('.bar-label')
-                .data(punctualityData)
-                .enter().append('text')
-                .attr('x', d => x(d.operator) + x.bandwidth() / 2)
-                .attr('y', d => y(d.onTime) - 5)
-                .attr('text-anchor', 'middle')
-                .style('font-size', '10px')
-                .style('fill', '#237644')
-                .text(d => d.onTime.toFixed(1) + '%');
-        }
-
-        function createSpeedChart() {
-            if (!allData.trainOperators || allData.trainOperators.length === 0) return;
-
-            const speedData = allData.trainOperators
-                .filter(d => d.average_speed > 0)
-                .sort((a, b) => b.average_speed - a.average_speed)
-                .slice(0, 15);
-
-            const container = d3.select('#average-speed-chart');
-            container.selectAll('*').remove();
-            
-            const svg = container.append('svg')
-                .attr('width', '100%')
-                .attr('height', 400);
-
-            const margin = {top: 20, right: 30, bottom: 120, left: 60};
-            const width = 800 - margin.left - margin.right;
-            const height = 400 - margin.top - margin.bottom;
-
-            svg.attr('viewBox', `0 0 800 400`);
-
-            const g = svg.append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-
-            const x = d3.scaleBand()
-                .rangeRound([0, width])
-                .padding(0.1)
-                .domain(speedData.map(d => d.operator));
-
-            const y = d3.scaleLinear()
-                .rangeRound([height, 0])
-                .domain([0, d3.max(speedData, d => d.average_speed)]);
-
-            g.append('g')
-                .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll('text')
-                .style('text-anchor', 'end')
-                .attr('dx', '-.8em')
-                .attr('dy', '.15em')
-                .attr('transform', 'rotate(-45)');
-
-            g.append('g')
-                .call(d3.axisLeft(y))
-                .append('text')
-                .attr('transform', 'rotate(-90)')
-                .attr('y', 6)
-                .attr('dy', '0.71em')
-                .attr('text-anchor', 'end')
-                .text('Average Speed (km/h)');
-
-            g.selectAll('.bar')
-                .data(speedData)
-                .enter().append('rect')
-                .attr('class', 'chart-bar')
-                .attr('x', d => x(d.operator))
-                .attr('y', d => y(d.average_speed))
-                .attr('width', x.bandwidth())
-                .attr('height', d => height - y(d.average_speed));
-
-            g.selectAll('.bar-label')
-                .data(speedData)
-                .enter().append('text')
-                .attr('x', d => x(d.operator) + x.bandwidth() / 2)
-                .attr('y', d => y(d.average_speed) - 5)
-                .attr('text-anchor', 'middle')
-                .style('font-size', '10px')
-                .style('fill', '#237644')
-                .text(d => d.average_speed.toFixed(0));
-        }
-
-        function createAmenitiesChart() {
-            if (!allData.trainOperators || allData.trainOperators.length === 0) return;
-
-            const amenityData = [
-                { amenity: 'WiFi', count: allData.trainOperators.filter(d => d.Wifi === 'yes').length },
-                { amenity: 'Power Outlets', count: allData.trainOperators.filter(d => d.electricity_plug === 'yes').length },
-                { amenity: 'Catering', count: allData.trainOperators.filter(d => d.catering_offer === 'yes').length },
-                { amenity: 'Night Trains', count: allData.trainOperators.filter(d => d.night_train === 'yes').length },
-                { amenity: 'Bike Transport', count: allData.trainOperators.filter(d => d.passenger_with_bike === 'yes').length }
-            ];
-
-            const container = d3.select('#service-amenities-chart');
-            container.selectAll('*').remove();
-            
-            const svg = container.append('svg')
-                .attr('width', '100%')
-                .attr('height', 300);
-
-            const margin = {top: 20, right: 30, bottom: 60, left: 60};
-            const width = 600 - margin.left - margin.right;
-            const height = 300 - margin.top - margin.bottom;
-
-            svg.attr('viewBox', `0 0 600 300`);
-
-            const g = svg.append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-
-            const x = d3.scaleBand()
-                .rangeRound([0, width])
-                .padding(0.1)
-                .domain(amenityData.map(d => d.amenity));
-
-            const y = d3.scaleLinear()
-                .rangeRound([height, 0])
-                .domain([0, d3.max(amenityData, d => d.count)]);
-
-            g.append('g')
-                .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll('text')
-                .style('text-anchor', 'end')
-                .attr('dx', '-.8em')
-                .attr('dy', '.15em')
-                .attr('transform', 'rotate(-45)');
-
-            g.append('g')
-                .call(d3.axisLeft(y));
-
-            g.selectAll('.bar')
-                .data(amenityData)
-                .enter().append('rect')
-                .attr('class', 'chart-bar')
-                .attr('x', d => x(d.amenity))
-                .attr('y', d => y(d.count))
-                .attr('width', x.bandwidth())
-                .attr('height', d => height - y(d.count));
-
-            g.selectAll('.bar-label')
-                .data(amenityData)
-                .enter().append('text')
-                .attr('x', d => x(d.amenity) + x.bandwidth() / 2)
-                .attr('y', d => y(d.count) - 5)
-                .attr('text-anchor', 'middle')
-                .style('font-size', '12px')
-                .style('fill', '#237644')
-                .text(d => d.count);
-        }
-
-        function createRefundPolicyAnalysis() {
-            if (!allData.trainOperators || allData.trainOperators.length === 0) return;
-
-            // Analyze refund and cancellation policies
-            const policyScores = allData.trainOperators.map(op => {
-                let score = 0;
-                
-                if (op.cancellation_possible === 'yes') score += 2;
-                if (op.refund_cancell === 'yes') score += 3;
-                else if (op.refund_cancell === 'partial') score += 1;
-                if (op.modify_posible === 'yes') score += 2;
-                
-                return {
-                    operator: op.operator,
-                    score: score,
-                    cancellation: op.cancellation_possible || 'no',
-                    refund: op.refund_cancell || 'no',
-                    modify: op.modify_posible || 'no'
-                };
-            }).sort((a, b) => b.score - a.score);
-
-            // Display top policy operators
-            const policyContainer = d3.select('#policy-rankings');
-            policyContainer.selectAll('*').remove();
-            
-            policyScores.slice(0, 10).forEach((op, i) => {
-                const cardClass = i < 3 ? 'policy-card excellent' : 'policy-card';
-                policyContainer.append('div')
-                    .attr('class', cardClass)
-                    .html(`
-                        <h3>#${i + 1} ${op.operator}</h3>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
-                            <span><strong>Cancellation:</strong> ${op.cancellation}</span>
-                            <span><strong>Refund:</strong> ${op.refund}</span>
-                            <span><strong>Modify:</strong> ${op.modify}</span>
-                        </div>
-                        <div style="text-align: right; margin-top: 0.5rem;">
-                            <strong>Policy Score: ${op.score}/7</strong>
-                        </div>
-                    `);
-            });
-
-            // Create policy metrics chart
-            const policyData = [
-                { policy: 'Cancellation Possible', count: allData.trainOperators.filter(d => d.cancellation_possible === 'yes').length },
-                { policy: 'Full Refund', count: allData.trainOperators.filter(d => d.refund_cancell === 'yes').length },
-                { policy: 'Partial Refund', count: allData.trainOperators.filter(d => d.refund_cancell === 'partial').length },
-                { policy: 'Modification Possible', count: allData.trainOperators.filter(d => d.modify_posible === 'yes').length }
-            ];
-
-            const metricsContainer = d3.select('#policy-metrics-chart');
-            metricsContainer.selectAll('*').remove();
-            
-            const svg = metricsContainer.append('svg')
-                .attr('width', '100%')
-                .attr('height', 300);
-
-            const margin = {top: 20, right: 30, bottom: 60, left: 60};
-            const width = 600 - margin.left - margin.right;
-            const height = 300 - margin.top - margin.bottom;
-
-            svg.attr('viewBox', `0 0 600 300`);
-
-            const g = svg.append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-
-            const x = d3.scaleBand()
-                .rangeRound([0, width])
-                .padding(0.1)
-                .domain(policyData.map(d => d.policy));
-
-            const y = d3.scaleLinear()
-                .rangeRound([height, 0])
-                .domain([0, d3.max(policyData, d => d.count)]);
-
-            g.append('g')
-                .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll('text')
-                .style('text-anchor', 'end')
-                .attr('dx', '-.8em')
-                .attr('dy', '.15em')
-                .attr('transform', 'rotate(-45)');
-
-            g.append('g')
-                .call(d3.axisLeft(y));
-
-            g.selectAll('.bar')
-                .data(policyData)
-                .enter().append('rect')
-                .attr('class', 'chart-bar')
-                .attr('x', d => x(d.policy))
-                .attr('y', d => y(d.count))
-                .attr('width', x.bandwidth())
-                .attr('height', d => height - y(d.count))
-                .style('fill', '#237644');
-
-            g.selectAll('.bar-label')
-                .data(policyData)
-                .enter().append('text')
-                .attr('x', d => x(d.policy) + x.bandwidth() / 2)
-                .attr('y', d => y(d.count) - 5)
-                .attr('text-anchor', 'middle')
-                .style('font-size', '12px')
-                .style('fill', '#237644')
-                .text(d => d.count);
-        }
-
-        function createSuperstarOperators() {
-            if (!allData.trainOperators || allData.trainOperators.length === 0) return;
-
-            // Calculate superstar scores based on multiple criteria
-            const superstarScores = allData.trainOperators.map(op => {
-                let score = 0;
-                let details = [];
-                
-                // Speed factor
-                if (op.average_speed > 100) {
-                    score += 3;
-                    details.push('High Speed');
-                } else if (op.average_speed > 80) {
-                    score += 2;
-                    details.push('Good Speed');
-                } else if (op.average_speed > 60) {
-                    score += 1;
-                    details.push('Decent Speed');
-                }
-                
-                // Services
-                if (op.Wifi === 'yes') {
-                    score += 1;
-                    details.push('WiFi');
-                }
-                if (op.electricity_plug === 'yes') {
-                    score += 1;
-                    details.push('Power Outlets');
-                }
-                if (op.catering_offer === 'yes') {
-                    score += 1;
-                    details.push('Catering');
-                }
-                
-                // Policy flexibility
-                if (op.refund_cancell === 'yes') {
-                    score += 2;
-                    details.push('Full Refund');
-                } else if (op.refund_cancell === 'partial') {
-                    score += 1;
-                    details.push('Partial Refund');
-                }
-                
-                if (op.cancellation_possible === 'yes') {
-                    score += 1;
-                    details.push('Cancellation');
-                }
-                
-                if (op.modify_posible === 'yes') {
-                    score += 1;
-                    details.push('Modification');
-                }
-                
-                return {
-                    operator: op.operator,
-                    score: score,
-                    details: details,
-                    speed: op.average_speed || 0,
-                    maxScore: 10
-                };
-            }).sort((a, b) => b.score - a.score);
-
-            // Display top 5 superstar operators
-            const superstarContainer = d3.select('#superstar-list');
-            superstarContainer.selectAll('*').remove();
-            
-            superstarScores.slice(0, 5).forEach((op, i) => {
-                superstarContainer.append('div')
-                    .attr('class', 'superstar-card')
-                    .html(`
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <h3>#${i + 1} ${op.operator}</h3>
-                                <p>Average Speed: ${op.speed.toFixed(0)} km/h</p>
-                            </div>
-                            <div class="superstar-score">${op.score}/${op.maxScore}</div>
-                        </div>
-                        <div class="operator-details">
-                            ${op.details.map(detail => `<span>${detail}</span>`).join('')}
-                        </div>
-                    `);
-            });
-
-            // Create scoring methodology
-            const methodologyContainer = d3.select('#scoring-methodology');
-            methodologyContainer.html(`
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-                    <div class="stat-card">
-                        <h3>Speed Scoring</h3>
-                        <p>High Speed (>100 km/h): 3 points<br>
-                        Good Speed (80-100 km/h): 2 points<br>
-                        Decent Speed (60-80 km/h): 1 point</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Service Amenities</h3>
-                        <p>WiFi: 1 point<br>
-                        Power Outlets: 1 point<br>
-                        Catering: 1 point</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Policy Flexibility</h3>
-                        <p>Full Refund: 2 points<br>
-                        Partial Refund: 1 point<br>
-                        Cancellation: 1 point<br>
-                        Modification: 1 point</p>
-                    </div>
-                </div>
-            `);
-        }
-
-        function createRouteComparison() {
-            if (!allData.routes || allData.routes.length === 0) return;
-
-            // Separate intercity and international routes
-            const intercityRoutes = allData.routes.filter(d => 
-                d.intercity_or_international && d.intercity_or_international.toLowerCase().includes('intercity')
-            );
-            const internationalRoutes = allData.routes.filter(d => 
-                d.intercity_or_international && d.intercity_or_international.toLowerCase().includes('international')
-            );
-
-            // Calculate averages with safe parsing
-            const intercityAvgPrice = intercityRoutes.length > 0 ? 
-                d3.mean(intercityRoutes.filter(d => d.price_eur > 0 && d.distance_km > 0), d => d.price_eur / d.distance_km) || 0 : 0;
-            const internationalAvgPrice = internationalRoutes.length > 0 ? 
-                d3.mean(internationalRoutes.filter(d => d.price_eur > 0 && d.distance_km > 0), d => d.price_eur / d.distance_km) || 0 : 0;
-            const intercityAvgSpeed = intercityRoutes.length > 0 ? 
-                d3.mean(intercityRoutes.filter(d => d.speed_km_per_hour > 0), d => d.speed_km_per_hour) || 0 : 0;
-            const internationalAvgSpeed = internationalRoutes.length > 0 ? 
-                d3.mean(internationalRoutes.filter(d => d.speed_km_per_hour > 0), d => d.speed_km_per_hour) || 0 : 0;
-
-            // Update route comparison cards
-            document.getElementById('intercity-count').textContent = intercityRoutes.length;
-            document.getElementById('international-count').textContent = internationalRoutes.length;
-            document.getElementById('intercity-avg-price').textContent = intercityAvgPrice.toFixed(3);
-            document.getElementById('international-avg-price').textContent = internationalAvgPrice.toFixed(3);
-            document.getElementById('intercity-avg-speed').textContent = intercityAvgSpeed.toFixed(1);
-            document.getElementById('international-avg-speed').textContent = internationalAvgSpeed.toFixed(1);
-
-            // Create price per km chart
-            const chartData = [
-                { type: 'Intercity', avgPrice: intercityAvgPrice },
-                { type: 'International', avgPrice: internationalAvgPrice }
-            ].filter(d => d.avgPrice > 0);
-
-            if (chartData.length > 0) {
-                const container = d3.select('#price-per-km-chart');
-                container.selectAll('*').remove();
-                
-                const svg = container.append('svg')
-                    .attr('width', '100%')
-                    .attr('height', 300);
-
-                const margin = {top: 20, right: 30, bottom: 60, left: 60};
-                const width = 400 - margin.left - margin.right;
-                const height = 300 - margin.top - margin.bottom;
-
-                svg.attr('viewBox', `0 0 400 300`);
-
-                const g = svg.append('g')
-                    .attr('transform', `translate(${margin.left},${margin.top})`);
-
-                const x = d3.scaleBand()
-                    .rangeRound([0, width])
-                    .padding(0.1)
-                    .domain(chartData.map(d => d.type));
-
-                const y = d3.scaleLinear()
-                    .rangeRound([height, 0])
-                    .domain([0, d3.max(chartData, d => d.avgPrice)]);
-
-                g.append('g')
-                    .attr('transform', `translate(0,${height})`)
-                    .call(d3.axisBottom(x));
-
-                g.append('g')
-                    .call(d3.axisLeft(y))
-                    .append('text')
-                    .attr('transform', 'rotate(-90)')
-                    .attr('y', 6)
-                    .attr('dy', '0.71em')
-                    .attr('text-anchor', 'end')
-                    .text('Price per km (€)');
-
-                g.selectAll('.bar')
-                    .data(chartData)
-                    .enter().append('rect')
-                    .attr('class', 'chart-bar')
-                    .attr('x', d => x(d.type))
-                    .attr('y', d => y(d.avgPrice))
-                    .attr('width', x.bandwidth())
-                    .attr('height', d => height - y(d.avgPrice));
-
-                g.selectAll('.bar-label')
-                    .data(chartData)
-                    .enter().append('text')
-                    .attr('x', d => x(d.type) + x.bandwidth() / 2)
-                    .attr('y', d => y(d.avgPrice) - 5)
-                    .attr('text-anchor', 'middle')
-                    .style('font-size', '12px')
-                    .style('fill', '#237644')
-                    .text(d => '€' + d.avgPrice.toFixed(3));
-            }
-
-            // Create best value routes table
-            const tableBody = document.getElementById('best-routes-body');
-            tableBody.innerHTML = '';
-            
-            // Sort routes by price per km
-            const sortedRoutes = allData.routes
-                .filter(route => route.price_eur > 0 && route.distance_km > 0)
-                .map(route => ({
-                    ...route,
-                    pricePerKm: route.price_eur / route.distance_km
-                }))
-                .sort((a, b) => a.pricePerKm - b.pricePerKm);
-            
-            sortedRoutes.slice(0, 10).forEach(route => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${route.route || '-'}</td>
-                    <td>${route.operator || '-'}</td>
-                    <td>${route.intercity_or_international || '-'}</td>
-                    <td>${route.distance_km.toFixed(0)}</td>
-                    <td>€${route.price_eur.toFixed(2)}</td>
-                    <td>€${route.pricePerKm.toFixed(3)}</td>
-                    <td>${route.speed_km_per_hour.toFixed(0)}</td>
+            if (countryInfo) {
+                tooltip.innerHTML = `
+                    <strong>${data.properties.name}</strong><br>
+                    Electrification: ${countryInfo.electrification_pct}%<br>
+                    Network: ${countryInfo.total_length_clean.toLocaleString()} km<br>
+                    Passengers: ${countryInfo.passenger_km_clean.toLocaleString()}M km
                 `;
-            });
+                tooltip.style.left = event.pageX + 10 + 'px';
+                tooltip.style.top = event.pageY - 10 + 'px';
+                tooltip.classList.add('active');
+            }
         }
 
-        // Initialize the application
-        loadData();
+        function hideTooltip() {
+            document.querySelector('.tooltip').classList.remove('active');
+        }
+
+        // Country details panel
+        function showCountryDetails(countryFeature) {
+            const panel = document.querySelector('.country-info-panel');
+            const details = document.getElementById('country-details');
+            const countryInfo = countryData.find(c => c.country === countryFeature.properties.name);
+            
+            if (countryInfo) {
+                details.innerHTML = `
+                    <h2>${countryInfo.country}</h2>
+                    <div class="country-stats" style="margin-top: 2rem;">
+                        <div class="route-stat-card">
+                            <div class="extreme-value">${countryInfo.electrification_pct}%</div>
+                            <div class="extreme-label">Electrified</div>
+                        </div>
+                        <div class="route-stat-card">
+                            <div class="extreme-value">${countryInfo.total_length_clean.toLocaleString()}</div>
+                            <div class="extreme-label">Total km</div>
+                        </div>
+                        <div class="route-stat-card">
+                            <div class="extreme-value">${countryInfo.passenger_km_clean.toLocaleString()}</div>
+                            <div class="extreme-label">Million passenger-km</div>
+                        </div>
+                    </div>
+                    <h3 style="margin-top: 2rem; color: #4ac77d;">Operators</h3>
+                    <div class="operator-list">
+                        ${getCountryOperators(countryInfo.country)}
+                    </div>
+                `;
+                panel.classList.add('active');
+            }
+        }
+
+        function closeCountryPanel() {
+            document.querySelector('.country-info-panel').classList.remove('active');
+        }
+
+        function getCountryOperators(country) {
+            // This would be populated from the operators data
+            return '<p style="color: #a0aec0;">Loading operator information...</p>';
+        }
+
+        // Journey planner functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add journey planner interactions
+            const journeyForm = document.querySelector('.journey-form');
+            if (journeyForm) {
+                journeyForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    // Implement journey search
+                    showJourneyResults();
+                });
+            }
+        });
+
+        function showJourneyResults() {
+            const results = document.querySelector('.journey-results');
+            if (results) {
+                results.innerHTML = `
+                    <div class="journey-option">
+                        <div>
+                            <h4 style="color: #4ac77d; margin-bottom: 0.5rem;">Fastest Option</h4>
+                            <p>TGV via SNCF - 2h 15min</p>
+                            <div class="features-grid" style="margin-top: 0.5rem;">
+                                <div class="feature-badge">320 km/h</div>
+                                <div class="feature-badge">€89</div>
+                                <div class="feature-badge">WiFi</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="nav-tab" style="padding: 0.5rem 1.5rem;">Book Now</button>
+                        </div>
+                    </div>
+                    <div class="journey-option">
+                        <div>
+                            <h4 style="color: #4ac77d; margin-bottom: 0.5rem;">Best Value</h4>
+                            <p>FlixTrain - 8h 30min</p>
+                            <div class="features-grid" style="margin-top: 0.5rem;">
+                                <div class="feature-badge">120 km/h</div>
+                                <div class="feature-badge">€29</div>
+                                <div class="feature-badge">Power outlets</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="nav-tab" style="padding: 0.5rem 1.5rem;">Book Now</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // Initialize on load
+        window.addEventListener('load', loadData);
     </script>
 </body>
-</html>
+</html>Average Electrification</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Operators Section -->
+    <section id="operators" class="content-section tab-content">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">The Superstar Operators</h2>
+                <p class="section-subtitle">Meet the champions of European rail travel</p>
+            </div>
+
+            <div class="operator-showcase">
+                <div class="operator-card">
+                    <div class="operator-rank">#1</div>
+                    <div class="operator-info">
+                        <h3>SBB - Swiss Federal Railways</h3>
+                        <p>The gold standard of punctuality and efficiency</p>
+                        <div class="operator-stats">
+                            <div class="operator-stat">
+                                <div class="operator-stat-value">90%</div>
+                                <div class="operator-stat-label">On Time</div>
+                            </div>
+                            <div class="operator-stat">
+                                <div class="operator-stat-value">100%</div>
+                                <div class="operator-stat-label">Electrified</div>
+                            </div>
+                            <div class="operator-stat">
+                                <div class="operator-stat-value">12mo</div>
+                                <div class="operator-stat-label">Booking</div>
+                            </div>
+                        </div>
+                        <div class="features-grid">
+                            <div class="feature-badge">WiFi</div>
+                            <div class="feature-badge">Power</div>
+                            <div class="feature-badge">Bikes</div>
+                            <div class="feature-badge">Catering</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="operator-card">
+                    <div class="operator-rank">#2</div>
+                    <div class="operator-info">
+                        <h3>SNCF - French National Railways</h3>
+                        <p>Speed demons of the rails</p>
+                        <div class="operator-stats">
+                            <div class="operator-stat">
+                                <div class="operator-stat-value">217km/h</div>
+                                <div class="operator-stat-label">Avg Speed</div>
+                            </div>
+                            <div class="operator-stat">
+                                <div class="operator-stat-value">87%</div>
+                                <div class="operator-stat-label">On Time</div>
+                            </div>
+                            <div class="operator-stat">
+                                <div class="operator-stat-value">Yes</div>
+                                <div class="operator-stat-label">Night Trains</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="operator-card">
+                    <div class="operator-rank">#3</div>
+                    <div class="operator-info">
+                        <h3>DB - German Railways</h3>
+                        <p>The network giant</p>
+                        <div class="operator-stats">
+                            <div class="operator-stat">
+                                <div class="operator-stat-value">38,691km</div>
+                                <div class="operator-stat-label">Network</div>
+                            </div>
+                            <div class="operator-stat">
+                                <div class="operator-stat-value">64%</div>
+                                <div class="operator-stat-label">On Time</div>
+                            </div>
+                            <div class="operator-stat">
+                                <div class="operator-stat-value">101B</div>
+                                <div class="operator-stat-label">Pass-km</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Journey Planner Section -->
+    <section id="journey-planner" class="content-section tab-content">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Plan Your Perfect Journey</h2>
+                <p class="section-subtitle">Compare routes by speed, price, or experience</p>
+            </div>
+
+            <div class="journey-planner">
+                <form class="journey-form">
+                    <div class="form-group">
+                        <label class="form-label">From</label>
+                        <input type="text" class="form-input" placeholder="e.g., Paris">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">To</label>
+                        <input type="text" class="form-input" placeholder="e.g., Berlin">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <select class="form-input">
+                            <option>Fastest</option>
+                            <option>Cheapest</option>
+                            <option>Most Comfortable</option>
+                            <option>Most Scenic</option>
+                        </select>
+                    </div>
+                </form>
+
+                <div class="journey-results">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+
+            <div class="fun-fact">
+                <strong>Pro tip:</strong> Book German trains 3+ months ahead for prices as low as €19 between major cities!
+            </div>
+        </div>
+    </section>
+
+    <!-- Sustainability Section -->
+    <section id="sustainability" class="content-section tab-content">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">The Green Revolution</h2>
+                <p class="section-subtitle">How Europe's railways are fighting climate change</p>
+            </div>
+
+            <div class="route-stats">
+                <div class="route-stat-card">
+                    <div class="extreme-value">52.9%</div>
+                    <div class="extreme-label">
