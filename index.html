@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Great European Rail Adventure - An Interactive Journey</title>
+    <title>European railway analysis</title>
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5/papaparse.min.js"></script>
@@ -17,35 +17,103 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #f0f9f4;
-            color: #1a3028;
+            color: #1a2e1a;
             line-height: 1.6;
             overflow-x: hidden;
         }
 
-        /* Hero Section */
+        /* Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            padding: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d9f5d;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #2d9f5d;
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: #2d9f5d;
+        }
+
+        /* Hero Section with Banner */
         .hero {
             position: relative;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #f0f9f4 0%, #4a9d5f 100%), 
-                url('/mnt/data/heading_2.png') center/cover no-repeat;
+            background: linear-gradient(to bottom, #a8e6cf 0%, #dcedc8 100%);
             overflow: hidden;
+            margin-top: 0;
         }
 
-        .hero::before {
-            content: '';
+        .hero-banner {
             position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            max-width: 90%;
+            z-index: 5;
+            opacity: 0.9;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
+        .hero-banner svg {
+            width: 100%;
+            height: auto;
         }
 
         .hero-content {
@@ -53,21 +121,21 @@
             z-index: 10;
             padding: 2rem;
             max-width: 900px;
+            margin-top: 350px;
         }
 
         .hero h1 {
             font-size: clamp(2.5rem, 8vw, 5rem);
             font-weight: 900;
             margin-bottom: 1.5rem;
-            color: #0d4f2a;
+            color: #1a5a3a;
             letter-spacing: -2px;
             animation: fadeInUp 1s ease-out;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .hero-subtitle {
             font-size: clamp(1.2rem, 3vw, 1.8rem);
-            color: #2a5f3e;
+            color: #2d6a4f;
             margin-bottom: 3rem;
             animation: fadeInUp 1s ease-out 0.2s both;
         }
@@ -91,84 +159,15 @@
             60% { transform: translateX(-50%) translateY(-10px); }
         }
 
-        /* Navigation */
-        .nav-container {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 0.5rem;
-            padding: 1rem 2rem;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .nav-tabs::-webkit-scrollbar {
-            display: none;
-        }
-
-        .nav-tab {
-            background: none;
-            border: 2px solid #4a9d5f;
-            padding: 0.75rem 1.5rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #2a5f3e;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-tab::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(74, 157, 95, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.5s, height 0.5s;
-        }
-
-        .nav-tab:hover::before {
-            width: 100%;
-            height: 100%;
-        }
-
-        .nav-tab:hover {
-            color: #ffffff;
-            border-color: #4a9d5f;
-            transform: translateY(-2px);
-        }
-
-        .nav-tab.active {
-            background: linear-gradient(135deg, #4a9d5f 0%, #6dc77a 100%);
-            color: white;
-            border-color: transparent;
-        }
-
         /* Content Sections */
         .content-section {
-            min-height: 100vh;
-            padding: 4rem 2rem;
+            padding: 5rem 2rem;
             position: relative;
-            display: none;
+            background: #ffffff;
         }
 
-        .content-section.active {
-            display: block;
+        .content-section:nth-child(even) {
+            background: #f8fffe;
         }
 
         .container {
@@ -186,12 +185,12 @@
             font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 800;
             margin-bottom: 1rem;
-            color: #0d4f2a;
+            color: #1a5a3a;
         }
 
         .section-subtitle {
             font-size: 1.3rem;
-            color: #3d7050;
+            color: #4a7c59;
             max-width: 700px;
             margin: 0 auto;
         }
@@ -205,14 +204,13 @@
         }
 
         .extreme-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-            border: 2px solid #a7e9af;
+            background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
+            border: 2px solid #c8e6c9;
             border-radius: 20px;
             padding: 2rem;
             position: relative;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .extreme-card::before {
@@ -222,7 +220,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(109, 199, 122, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(45, 159, 93, 0.1) 0%, transparent 70%);
             transform: rotate(45deg);
             transition: all 0.5s;
             opacity: 0;
@@ -234,8 +232,8 @@
 
         .extreme-card:hover {
             transform: translateY(-5px);
-            border-color: #4a9d5f;
-            box-shadow: 0 10px 30px rgba(74, 157, 95, 0.2);
+            border-color: #2d9f5d;
+            box-shadow: 0 10px 30px rgba(45, 159, 93, 0.2);
         }
 
         .extreme-icon {
@@ -246,50 +244,49 @@
         .extreme-value {
             font-size: 2.5rem;
             font-weight: 900;
-            color: #4a9d5f;
+            color: #2d9f5d;
             margin-bottom: 0.5rem;
         }
 
         .extreme-label {
             font-size: 1.1rem;
-            color: #3d7050;
+            color: #4a7c59;
             margin-bottom: 0.5rem;
             font-weight: 600;
         }
 
         .extreme-detail {
             font-size: 0.9rem;
-            color: #5a8069;
+            color: #6b8e6b;
         }
 
         /* Map Section */
         .map-container {
-            background: rgba(255, 255, 255, 0.9);
+            background: #f0f9f4;
             border-radius: 20px;
             padding: 2rem;
             margin-bottom: 2rem;
-            border: 2px solid #a7e9af;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 2px solid #c8e6c9;
         }
 
         #europe-map {
             width: 100%;
             height: 600px;
             border-radius: 12px;
-            background: rgba(240, 249, 244, 0.5);
+            background: #ffffff;
         }
 
         .country {
-            stroke: rgba(13, 79, 42, 0.2);
+            stroke: #c8e6c9;
             stroke-width: 0.5;
             transition: all 0.3s ease;
             cursor: pointer;
         }
 
         .country:hover {
-            stroke: #4a9d5f;
+            stroke: #2d9f5d;
             stroke-width: 2;
-            filter: brightness(1.2);
+            filter: brightness(1.1);
         }
 
         /* Country Info Panel */
@@ -299,9 +296,9 @@
             top: 0;
             width: 400px;
             height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
-            border-left: 2px solid #a7e9af;
+            border-left: 2px solid #c8e6c9;
             padding: 2rem;
             transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
@@ -319,14 +316,14 @@
             right: 1rem;
             background: none;
             border: none;
-            color: #3d7050;
+            color: #4a7c59;
             font-size: 2rem;
             cursor: pointer;
             transition: color 0.3s;
         }
 
         .close-panel:hover {
-            color: #4a9d5f;
+            color: #2d9f5d;
         }
 
         /* Operator Cards */
@@ -337,8 +334,8 @@
         }
 
         .operator-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-            border: 2px solid #a7e9af;
+            background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
+            border: 2px solid #c8e6c9;
             border-radius: 20px;
             padding: 2rem;
             display: grid;
@@ -346,25 +343,25 @@
             gap: 2rem;
             align-items: center;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .operator-card:hover {
             transform: translateX(10px);
-            border-color: #4a9d5f;
-            box-shadow: 0 10px 30px rgba(74, 157, 95, 0.2);
+            border-color: #2d9f5d;
+            box-shadow: 0 10px 30px rgba(45, 159, 93, 0.2);
         }
 
         .operator-rank {
             font-size: 4rem;
             font-weight: 900;
-            color: #a7e9af;
+            color: #2d9f5d;
+            opacity: 0.3;
         }
 
         .operator-info h3 {
             font-size: 1.8rem;
             margin-bottom: 0.5rem;
-            color: #0d4f2a;
+            color: #1a5a3a;
         }
 
         .operator-stats {
@@ -380,12 +377,12 @@
         .operator-stat-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #4a9d5f;
+            color: #2d9f5d;
         }
 
         .operator-stat-label {
             font-size: 0.8rem;
-            color: #5a8069;
+            color: #6b8e6b;
         }
 
         /* Features Grid */
@@ -397,14 +394,13 @@
         }
 
         .feature-badge {
-            background: rgba(167, 233, 175, 0.2);
-            border: 1px solid rgba(74, 157, 95, 0.5);
+            background: rgba(45, 159, 93, 0.1);
+            border: 1px solid rgba(45, 159, 93, 0.3);
             padding: 0.5rem;
             border-radius: 10px;
             text-align: center;
             font-size: 0.9rem;
-            color: #2a5f3e;
-            font-weight: 500;
+            color: #2d9f5d;
         }
 
         /* Route Analysis */
@@ -416,8 +412,8 @@
         }
 
         .route-stat-card {
-            background: linear-gradient(135deg, rgba(167, 233, 175, 0.3) 0%, rgba(109, 199, 122, 0.2) 100%);
-            border: 2px solid rgba(74, 157, 95, 0.5);
+            background: linear-gradient(135deg, rgba(45, 159, 93, 0.1) 0%, rgba(45, 159, 93, 0.05) 100%);
+            border: 2px solid rgba(45, 159, 93, 0.3);
             border-radius: 15px;
             padding: 2rem;
             text-align: center;
@@ -426,97 +422,16 @@
 
         .route-stat-card:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(74, 157, 95, 0.3);
-        }
-
-        /* Tooltips */
-        .tooltip {
-            position: absolute;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            color: #1a3028;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            pointer-events: none;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(74, 157, 95, 0.5);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .tooltip.active {
-            opacity: 1;
-        }
-
-        /* Loading and Error States */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 400px;
-            font-size: 1.2rem;
-            color: #3d7050;
-        }
-
-        .loading::before {
-            content: '';
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(74, 157, 95, 0.3);
-            border-top-color: #4a9d5f;
-            border-radius: 50%;
-            margin-right: 1rem;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: rgba(220, 38, 38, 0.1);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            color: #dc2626;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin: 2rem 0;
-            text-align: center;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero h1 {
-                letter-spacing: -1px;
-            }
-
-            .nav-tabs {
-                padding: 1rem;
-            }
-
-            .country-info-panel {
-                width: 100%;
-                right: -100%;
-            }
-
-            .operator-card {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .operator-rank {
-                font-size: 3rem;
-            }
+            box-shadow: 0 10px 30px rgba(45, 159, 93, 0.3);
         }
 
         /* Journey Planner */
         .journey-planner {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-            border: 2px solid #a7e9af;
+            background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
+            border: 2px solid #c8e6c9;
             border-radius: 20px;
             padding: 3rem;
             margin: 4rem 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .journey-form {
@@ -533,15 +448,15 @@
 
         .form-label {
             font-size: 0.9rem;
-            color: #3d7050;
+            color: #4a7c59;
             margin-bottom: 0.5rem;
             font-weight: 600;
         }
 
         .form-input {
-            background: rgba(240, 249, 244, 0.5);
-            border: 1px solid #a7e9af;
-            color: #1a3028;
+            background: white;
+            border: 2px solid #c8e6c9;
+            color: #1a5a3a;
             padding: 0.75rem 1rem;
             border-radius: 10px;
             font-size: 1rem;
@@ -550,141 +465,272 @@
 
         .form-input:focus {
             outline: none;
-            border-color: #4a9d5f;
-            box-shadow: 0 0 0 3px rgba(74, 157, 95, 0.1);
-            background: white;
+            border-color: #2d9f5d;
+            box-shadow: 0 0 0 3px rgba(45, 159, 93, 0.1);
         }
 
-        .journey-results {
-            display: grid;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .journey-option {
-            background: rgba(240, 249, 244, 0.5);
-            border: 1px solid #a7e9af;
-            border-radius: 15px;
-            padding: 1.5rem;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 1rem;
-            align-items: center;
+        .search-button {
+            background: #2d9f5d;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
             transition: all 0.3s;
+            margin-top: 1rem;
         }
 
-        .journey-option:hover {
-            border-color: #4a9d5f;
-            transform: translateX(5px);
-            background: white;
+        .search-button:hover {
+            background: #248f4d;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 159, 93, 0.3);
         }
 
         /* Fun Facts */
         .fun-fact {
-            background: linear-gradient(135deg, rgba(167, 233, 175, 0.2) 0%, transparent 100%);
-            border-left: 4px solid #4a9d5f;
+            background: linear-gradient(135deg, rgba(45, 159, 93, 0.1) 0%, transparent 100%);
+            border-left: 4px solid #2d9f5d;
             padding: 1.5rem;
             margin: 2rem 0;
             border-radius: 0 15px 15px 0;
             font-style: italic;
-            color: #3d7050;
+            color: #4a7c59;
         }
 
         .fun-fact strong {
-            color: #0d4f2a;
+            color: #2d9f5d;
             font-style: normal;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #4a9d5f 0%, #6dc77a 100%);
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+        /* Tooltips */
+        .tooltip {
+            position: absolute;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            color: #1a5a3a;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(45, 159, 93, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 157, 95, 0.3);
+        .tooltip.active {
+            opacity: 1;
+        }
+
+        /* Loading and Error States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            font-size: 1.2rem;
+            color: #4a7c59;
+        }
+
+        .loading::before {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(45, 159, 93, 0.3);
+            border-top-color: #2d9f5d;
+            border-radius: 50%;
+            margin-right: 1rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                letter-spacing: -1px;
+            }
+
+            .hero-banner {
+                width: 400px;
+            }
+
+            .hero-content {
+                margin-top: 250px;
+            }
+
+            .country-info-panel {
+                width: 100%;
+                right: -100%;
+            }
+
+            .operator-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .operator-rank {
+                font-size: 3rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🚄 Rail Adventure</div>
+            <div class="nav-links">
+                <a href="#extremes" class="nav-link">Extremes</a>
+                <a href="#rail-nations" class="nav-link">Rail Nations</a>
+                <a href="#operators" class="nav-link">Top Operators</a>
+                <a href="#journey" class="nav-link">Plan Journey</a>
+                <a href="#sustainability" class="nav-link">Sustainability</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Banner -->
     <section class="hero">
+        <div class="hero-banner">
+            <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <rect width="800" height="600" fill="#a8e6cf"/>
+                
+                <!-- Train car -->
+                <rect x="200" y="250" width="400" height="200" rx="20" fill="#4CAF50" stroke="#2E7D32" stroke-width="3"/>
+                
+                <!-- Windows -->
+                <rect x="230" y="280" width="80" height="60" rx="10" fill="#81C784" stroke="#2E7D32" stroke-width="2"/>
+                <rect x="340" y="280" width="80" height="60" rx="10" fill="#81C784" stroke="#2E7D32" stroke-width="2"/>
+                <rect x="450" y="280" width="80" height="60" rx="10" fill="#81C784" stroke="#2E7D32" stroke-width="2"/>
+                
+                <!-- Doors -->
+                <rect x="320" y="350" width="60" height="100" rx="5" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/>
+                <rect x="420" y="350" width="60" height="100" rx="5" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/>
+                
+                <!-- Rails -->
+                <rect x="0" y="460" width="800" height="10" fill="#424242"/>
+                <rect x="0" y="480" width="800" height="10" fill="#424242"/>
+                
+                <!-- Passengers -->
+                <g transform="translate(250, 380)">
+                    <circle cx="15" cy="15" r="12" fill="#FFB74D"/>
+                    <rect x="5" y="25" width="20" height="30" rx="5" fill="#2E7D32"/>
+                    <rect x="0" y="50" width="30" height="20" rx="3" fill="#1B5E20"/>
+                </g>
+                
+                <g transform="translate(350, 380)">
+                    <circle cx="15" cy="15" r="12" fill="#F48FB1"/>
+                    <rect x="5" y="25" width="20" height="30" rx="5" fill="#E8F5E9"/>
+                    <rect x="0" y="50" width="30" height="20" rx="3" fill="#C8E6C9"/>
+                </g>
+                
+                <g transform="translate(450, 380)">
+                    <circle cx="15" cy="15" r="12" fill="#8D6E63"/>
+                    <rect x="5" y="25" width="20" height="35" rx="5" fill="#FFB300"/>
+                    <rect x="0" y="55" width="30" height="15" rx="3" fill="#FF8F00"/>
+                </g>
+                
+                <g transform="translate(500, 380)">
+                    <circle cx="15" cy="15" r="12" fill="#5D4037"/>
+                    <rect x="5" y="25" width="20" height="30" rx="5" fill="#2E7D32"/>
+                    <rect x="0" y="50" width="30" height="20" rx="3" fill="#1B5E20"/>
+                </g>
+                
+                <g transform="translate(540, 390)">
+                    <circle cx="12" cy="12" r="10" fill="#795548"/>
+                    <rect x="4" y="20" width="16" height="25" rx="4" fill="#4CAF50"/>
+                    <rect x="0" y="40" width="24" height="15" rx="3" fill="#388E3C"/>
+                </g>
+                
+                <!-- Overhead lines -->
+                <line x1="0" y1="200" x2="800" y2="200" stroke="#616161" stroke-width="2"/>
+                <line x1="100" y1="200" x2="100" y2="250" stroke="#616161" stroke-width="2"/>
+                <line x1="300" y1="200" x2="300" y2="250" stroke="#616161" stroke-width="2"/>
+                <line x1="500" y1="200" x2="500" y2="250" stroke="#616161" stroke-width="2"/>
+                <line x1="700" y1="200" x2="700" y2="250" stroke="#616161" stroke-width="2"/>
+                
+                <!-- Pantograph -->
+                <rect x="390" y="240" width="20" height="10" rx="2" fill="#9CCC65"/>
+                <polygon points="395,240 400,220 405,240" fill="#616161"/>
+                
+                <!-- Decorative elements -->
+                <rect x="560" y="300" width="30" height="5" rx="2" fill="#FF5252" opacity="0.8"/>
+                <rect x="560" y="310" width="30" height="5" rx="2" fill="#E91E63" opacity="0.8"/>
+                <rect x="560" y="320" width="30" height="5" rx="2" fill="#FF5252" opacity="0.8"/>
+            </svg>
+        </div>
         <div class="hero-content">
-            <h1>The Great European Rail Adventure</h1>
-            <p class="hero-subtitle">From 19 km/h mountain railways to 274 km/h speed demons</p>
+            <h1>European railways</h1>
+            <p class="hero-subtitle">Explore the European railways and comparing the <br> passenger experience across European train operators</p>
             <div class="scroll-indicator">
                 <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-                    <path d="M15 20L10 15L11.4 13.6L15 17.2L18.6 13.6L20 15L15 20Z" fill="#0d4f2a"/>
+                    <path d="M15 20L10 15L11.4 13.6L15 17.2L18.6 13.6L20 15L15 20Z" fill="#2d9f5d"/>
                 </svg>
             </div>
         </div>
     </section>
 
-    <!-- Navigation -->
-    <nav class="nav-container">
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('extremes', event)">Europe railways</button>
-            <button class="nav-tab" onclick="showTab('europe-map', event)"> Railway by country</button>
-            <button class="nav-tab" onclick="showTab('operators', event)"> Top operators</button>
-            <button class="nav-tab" onclick="showTab('sustainability', event)"> Green impact</button>
-        </div>
-    </nav>
-
     <!-- The Extremes Section -->
-    <section id="extremes" class="content-section tab-content active">
+    <section id="extremes" class="content-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Europe's Railway Extremes</h2>
-                <p class="section-subtitle">Where speed meets tradition, and luxury clashes with value</p>
+                <h2 class="section-title">Key highlights of European railway</h2>
             </div>
 
             <div class="extremes-grid">
                 <div class="extreme-card">
-                    <div class="extreme-icon">🏎️</div>
-                    <div class="extreme-value">274 km/h</div>
-                    <div class="extreme-label">Speed Champion</div>
-                    <div class="extreme-detail">Ouigo's Paris-Bordeaux route blazes through France at amazing speeds</div>
+                    <div class="extreme-value">238,664 km</div>
+                    <div class="extreme-label">Total train line length</div>
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-icon">💸</div>
-                    <div class="extreme-value">€1.04/km</div>
-                    <div class="extreme-label">Premium price</div>
-                    <div class="extreme-detail">London-Milton Keynes - where your wallet travels light</div>
+                    <div class="extreme-value">441,775 km/h</div>
+                    <div class="extreme-label">million passenger per km</div>
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-icon">⚡</div>
-                    <div class="extreme-value">100%</div>
-                    <div class="extreme-label">Fully Electric</div>
-                    <div class="extreme-detail">Switzerland - where every train runs on clean energy</div>
+                    <div class="extreme-value">53%</div>
+                    <div class="extreme-label">Train line lenghth is electrified</div>
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-icon">⏰</div>
-                    <div class="extreme-value">90%</div>
-                    <div class="extreme-label">Punctuality king</div>
-                    <div class="extreme-detail">SBB - Swiss precision isn't just for watches</div>
+                    <div class="extreme-value">77%</div>
+                    <div class="extreme-label">Average punctuality</div>
+                </div>
+
+                <div class="extreme-card">
+                    <div class="extreme-value">37%</div>
+                    <div class="extreme-label">Passengers travel with bike</div>
+                </div>
+
+                <div class="extreme-card">
+                    <div class="extreme-value">115,559 km/h</div>
+                    <div class="extreme-label">Average speed </div>
                 </div>
             </div>
 
             <div class="fun-fact">
-                <strong>Did you know?</strong> The speed difference between Europe's fastest and slowest trains is 255 km/h!
+                <strong>Did you know?</strong> The speed difference between Europe's fastest and slowest trains is 255 km/h - 
+                that's like comparing a Formula 1 car to a leisurely bicycle ride!
             </div>
         </div>
     </section>
 
-    <!-- Europe Map Section -->
-    <section id="europe-map-section" class="content-section tab-content">
+    <!-- Rail Nations Section -->
+    <section id="rail-nations" class="content-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Railway by country</h2>
+                <h2 class="section-title">Rail Nations of Europe</h2>
                 <p class="section-subtitle">Click any country to explore its railway story</p>
             </div>
 
@@ -695,31 +741,18 @@
             <div class="route-stats">
                 <div class="route-stat-card">
                     <div class="extreme-value">30</div>
-                    <div class="extreme-label">Countries</div>
+                    <div class="extreme-label">Countries connected</div>
                 </div>
                 <div class="route-stat-card">
                     <div class="extreme-value">254</div>
                     <div class="extreme-label">International routes</div>
                 </div>
-                <div class="route-stat-card">
-                    <div class="extreme-value">52.9%</div>
-                    <div class="extreme-label">Average electrification of railway</div>
-                </div>
-                <div class="route-stat-card">
-                    <div class="extreme-value">7.5x</div>
-                    <div class="extreme-label">Less CO₂ than flying</div>
-                </div>
-            </div>
-
-            <div class="fun-fact">
-                <strong>Climate win:</strong> If just 10% of European flights under 1000km switched to rail, 
-                we'd save 1.5 million tonnes of CO₂ annually - equivalent to removing 750,000 cars from the roads!
             </div>
         </div>
     </section>
 
     <!-- Top Operators Section -->
-    <section id="operators" class="content-section tab-content">
+    <section id="operators" class="content-section">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">The Superstar Operators</h2>
@@ -753,7 +786,6 @@
                             <div class="feature-badge">Catering</div>
                         </div>
                     </div>
-                    <button class="btn-primary">Book Now</button>
                 </div>
 
                 <div class="operator-card">
@@ -776,7 +808,6 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn-primary">Book Now</button>
                 </div>
 
                 <div class="operator-card">
@@ -799,14 +830,13 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn-primary">Book Now</button>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Journey Planner Section -->
-    <section id="journey-planner" class="content-section tab-content">
+    <section id="journey" class="content-section">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Plan Your Perfect Journey</h2>
@@ -814,14 +844,14 @@
             </div>
 
             <div class="journey-planner">
-                <form class="journey-form">
+                <form class="journey-form" onsubmit="searchJourney(event)">
                     <div class="form-group">
                         <label class="form-label">From</label>
-                        <input type="text" class="form-input" placeholder="e.g., Paris">
+                        <input type="text" class="form-input" placeholder="e.g., Paris" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">To</label>
-                        <input type="text" class="form-input" placeholder="e.g., Berlin">
+                        <input type="text" class="form-input" placeholder="e.g., Berlin" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Priority</label>
@@ -834,11 +864,11 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">&nbsp;</label>
-                        <button type="submit" class="btn-primary">Search Routes</button>
+                        <button type="submit" class="search-button">Search Routes</button>
                     </div>
                 </form>
 
-                <div class="journey-results">
+                <div class="journey-results" id="journey-results">
                     <!-- Results will be populated here -->
                 </div>
             </div>
@@ -850,30 +880,11 @@
     </section>
 
     <!-- Sustainability Section -->
-    <section id="sustainability" class="content-section tab-content">
+    <section id="sustainability" class="content-section">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">The Green Revolution</h2>
                 <p class="section-subtitle">How Europe's railways are fighting climate change</p>
-            </div>
-
-            <div class="route-stats">
-                <div class="route-stat-card">
-                    <div class="extreme-value">52.9%</div>
-                    <div class="extreme-label">Average Electrification</div>
-                </div>
-                <div class="route-stat-card">
-                    <div class="extreme-value">7.5x</div>
-                    <div class="extreme-label">Less CO₂ than Flying</div>
-                </div>
-                <div class="route-stat-card">
-                    <div class="extreme-value">4x</div>
-                    <div class="extreme-label">Less CO₂ than Driving</div>
-                </div>
-                <div class="route-stat-card">
-                    <div class="extreme-value">100%</div>
-                    <div class="extreme-label">Swiss Renewable Energy</div>
-                </div>
             </div>
 
             <div class="extremes-grid">
@@ -883,12 +894,12 @@
                     <div class="extreme-label">Switzerland</div>
                     <div class="extreme-detail">Fully electrified network powered by renewable energy</div>
                 </div>
-                <div class="extreme-card">
+                <!-- <div class="extreme-card">
                     <div class="extreme-icon">🇳🇱</div>
                     <div class="extreme-value">100%</div>
                     <div class="extreme-label">Netherlands</div>
                     <div class="extreme-detail">All electric trains run on wind power since 2017</div>
-                </div>
+                </div> -->
                 <div class="extreme-card">
                     <div class="extreme-icon">🌙</div>
                     <div class="extreme-value">Growing</div>
@@ -898,7 +909,229 @@
             </div>
 
             <div class="fun-fact">
-                <strong>Green fact:</strong> A single high-speed train can replace up to 500 car trips or 3 short-haul flights, 
-                making rail the most sustainable way to cross Europe!
+                <strong>Climate win:</strong> If just 10% of European flights under 1000km switched to rail, 
+                we'd save 1.5 million tonnes of CO₂ annually - equivalent to removing 750,000 cars from the roads!
             </div>
         </div>
+    </section>
+
+    <!-- Country Info Panel -->
+    <div class="country-info-panel">
+        <button class="close-panel" onclick="closeCountryPanel()">×</button>
+        <div id="country-details">
+            <!-- Country details will be populated here -->
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip"></div>
+
+    <script>
+        // Global variables
+        let countryData = [];
+        let operatorData = [];
+        let routeData = [];
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const navHeight = document.querySelector('.navbar').offsetHeight;
+                    const targetPosition = target.offsetTop - navHeight - 20;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Load data
+        async function loadData() {
+            try {
+                // Simulate data loading for demo
+                countryData = [
+                    { country: 'Switzerland', electrification_pct: 100, total_length_clean: 5177, passenger_km_clean: 21700 },
+                    { country: 'Netherlands', electrification_pct: 100, total_length_clean: 3223, passenger_km_clean: 18500 },
+                    { country: 'Germany', electrification_pct: 61, total_length_clean: 38691, passenger_km_clean: 101000 },
+                    { country: 'France', electrification_pct: 59, total_length_clean: 27593, passenger_km_clean: 116000 }
+                ];
+                
+                // Initialize map after data loads
+                initializeMap();
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // Initialize map
+        function initializeMap() {
+            const width = document.getElementById('europe-map').clientWidth;
+            const height = 600;
+            
+            const svg = d3.select('#europe-map')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const projection = d3.geoMercator()
+                .center([10, 52])
+                .scale(width / 1.5)
+                .translate([width / 2, height / 2]);
+            
+            const path = d3.geoPath().projection(projection);
+            
+            // Color scale based on electrification
+            const colorScale = d3.scaleSequential()
+                .domain([0, 100])
+                .interpolator(d3.interpolateGreens);
+            
+            // Load Europe topology
+            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+                .then(function(world) {
+                    const countries = topojson.feature(world, world.objects.countries);
+                    
+                    // Create country data map
+                    const dataMap = new Map();
+                    countryData.forEach(d => {
+                        dataMap.set(d.country, d);
+                    });
+                    
+                    // Draw countries
+                    svg.selectAll('.country')
+                        .data(countries.features)
+                        .enter()
+                        .append('path')
+                        .attr('class', 'country')
+                        .attr('d', path)
+                        .style('fill', d => {
+                            const countryName = d.properties.name;
+                            const data = dataMap.get(countryName);
+                            return data ? colorScale(data.electrification_pct) : '#e8f5e9';
+                        })
+                        .on('mouseover', function(event, d) {
+                            showTooltip(event, d);
+                        })
+                        .on('mouseout', hideTooltip)
+                        .on('click', function(event, d) {
+                            showCountryDetails(d);
+                        });
+                });
+        }
+
+        // Tooltip functions
+        function showTooltip(event, data) {
+            const tooltip = document.querySelector('.tooltip');
+            const countryInfo = countryData.find(c => c.country === data.properties.name);
+            
+            if (countryInfo) {
+                tooltip.innerHTML = `
+                    <strong>${data.properties.name}</strong><br>
+                    Electrification: ${countryInfo.electrification_pct}%<br>
+                    Network: ${countryInfo.total_length_clean.toLocaleString()} km<br>
+                    Passengers: ${countryInfo.passenger_km_clean.toLocaleString()}M km
+                `;
+                tooltip.style.left = event.pageX + 10 + 'px';
+                tooltip.style.top = event.pageY - 10 + 'px';
+                tooltip.classList.add('active');
+            }
+        }
+
+        function hideTooltip() {
+            document.querySelector('.tooltip').classList.remove('active');
+        }
+
+        // Country details panel
+        function showCountryDetails(countryFeature) {
+            const panel = document.querySelector('.country-info-panel');
+            const details = document.getElementById('country-details');
+            const countryInfo = countryData.find(c => c.country === countryFeature.properties.name);
+            
+            if (countryInfo) {
+                details.innerHTML = `
+                    <h2 style="color: #1a5a3a; margin-bottom: 2rem;">${countryInfo.country}</h2>
+                    <div class="route-stats" style="margin-top: 2rem;">
+                        <div class="route-stat-card">
+                            <div class="extreme-value">${countryInfo.electrification_pct}%</div>
+                            <div class="extreme-label">Electrified</div>
+                        </div>
+                        <div class="route-stat-card">
+                            <div class="extreme-value">${countryInfo.total_length_clean.toLocaleString()}</div>
+                            <div class="extreme-label">Total km</div>
+                        </div>
+                        <div class="route-stat-card">
+                            <div class="extreme-value">${countryInfo.passenger_km_clean.toLocaleString()}</div>
+                            <div class="extreme-label">Million passenger-km</div>
+                        </div>
+                    </div>
+                `;
+                panel.classList.add('active');
+            }
+        }
+
+        function closeCountryPanel() {
+            document.querySelector('.country-info-panel').classList.remove('active');
+        }
+
+        // Journey search
+        function searchJourney(event) {
+            event.preventDefault();
+            const results = document.getElementById('journey-results');
+            
+            results.innerHTML = `
+                <div class="loading">Searching for the best routes...</div>
+            `;
+            
+            // Simulate search delay
+            setTimeout(() => {
+                results.innerHTML = `
+                    <div class="journey-option" style="background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%); border: 2px solid #c8e6c9; border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="color: #2d9f5d; margin-bottom: 0.5rem;">Fastest Option</h4>
+                            <p style="color: #4a7c59;">TGV via SNCF - 2h 15min</p>
+                            <div class="features-grid" style="margin-top: 0.5rem;">
+                                <div class="feature-badge">320 km/h</div>
+                                <div class="feature-badge">€89</div>
+                                <div class="feature-badge">WiFi</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="search-button" style="margin: 0;">Book Now</button>
+                        </div>
+                    </div>
+                    <div class="journey-option" style="background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%); border: 2px solid #c8e6c9; border-radius: 15px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="color: #2d9f5d; margin-bottom: 0.5rem;">Best Value</h4>
+                            <p style="color: #4a7c59;">FlixTrain - 8h 30min</p>
+                            <div class="features-grid" style="margin-top: 0.5rem;">
+                                <div class="feature-badge">120 km/h</div>
+                                <div class="feature-badge">€29</div>
+                                <div class="feature-badge">Power outlets</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="search-button" style="margin: 0;">Book Now</button>
+                        </div>
+                    </div>
+                `;
+            }, 1500);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', loadData);
+    </script>
+</body>
+</html>
