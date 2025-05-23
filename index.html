@@ -589,10 +589,9 @@
         <div class="nav-container">
             <div class="nav-logo">🚄 Rail Adventure</div>
             <div class="nav-links">
-                <a href="#extremes" class="nav-link">Extremes</a>
+                <a href="#extremes" class="nav-link">Highlights/a>
                 <a href="#rail-nations" class="nav-link">Rail Nations</a>
                 <a href="#operators" class="nav-link">Top Operators</a>
-                <a href="#journey" class="nav-link">Plan Journey</a>
                 <a href="#sustainability" class="nav-link">Sustainability</a>
             </div>
         </div>
@@ -730,8 +729,8 @@
     <section id="rail-nations" class="content-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Rail Nations of Europe</h2>
-                <p class="section-subtitle">Click any country to explore its railway story</p>
+                <h2 class="section-title">Rail network of Europe</h2>
+                <p class="section-subtitle">Click on the country to explore the length of railways, percentage of the length are electrified and passenger (in Million) per km</p>
             </div>
 
             <div class="map-container">
@@ -749,14 +748,21 @@
                 </div>
             </div>
         </div>
+        <div class="extremes-grid">
+                <div class="extreme-card">
+                    <div class="extreme-icon">🇨🇭</div>
+                    <div class="extreme-value">100%</div>
+                    <div class="extreme-label">Switzerland</div>
+                    <div class="extreme-detail">Fully electrified network powered by renewable energy</div>
+        </div>
     </section>
 
     <!-- Top Operators Section -->
     <section id="operators" class="content-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">The Superstar Operators</h2>
-                <p class="section-subtitle">Meet the champions of European rail travel</p>
+                <h2 class="section-title">The Superstar operators</h2>
+                <p class="section-subtitle">Meet the best operator of of Europe</p>
             </div>
 
             <div class="operator-showcase">
@@ -771,148 +777,43 @@
                                 <div class="operator-stat-label">On Time</div>
                             </div>
                             <div class="operator-stat">
-                                <div class="operator-stat-value">100%</div>
-                                <div class="operator-stat-label">Electrified</div>
-                            </div>
-                            <div class="operator-stat">
-                                <div class="operator-stat-value">12mo</div>
-                                <div class="operator-stat-label">Booking</div>
+                                <div class="operator-stat-value">76%</div>
+                                <div class="operator-stat-label">Traveller with bike</div>
                             </div>
                         </div>
                         <div class="features-grid">
                             <div class="feature-badge">WiFi</div>
-                            <div class="feature-badge">Power</div>
+                            <div class="feature-badge">Electric plug</div>
                             <div class="feature-badge">Bikes</div>
                             <div class="feature-badge">Catering</div>
                         </div>
                     </div>
                 </div>
 
+            <div class="operator-showcase">
                 <div class="operator-card">
-                    <div class="operator-rank">#2</div>
+                    <div class="operator-rank">#1</div>
                     <div class="operator-info">
-                        <h3>SNCF - French National Railways</h3>
-                        <p>Speed demons of the rails</p>
+                        <h3>Regiojet</h3>
                         <div class="operator-stats">
                             <div class="operator-stat">
-                                <div class="operator-stat-value">217km/h</div>
-                                <div class="operator-stat-label">Avg Speed</div>
-                            </div>
-                            <div class="operator-stat">
-                                <div class="operator-stat-value">87%</div>
+                                <div class="operator-stat-value">89%</div>
                                 <div class="operator-stat-label">On Time</div>
                             </div>
                             <div class="operator-stat">
-                                <div class="operator-stat-value">Yes</div>
-                                <div class="operator-stat-label">Night Trains</div>
+                                <div class="operator-stat-value">34%</div>
+                                <div class="operator-stat-label">Traveller with bike</div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="operator-card">
-                    <div class="operator-rank">#3</div>
-                    <div class="operator-info">
-                        <h3>DB - German Railways</h3>
-                        <p>The network giant</p>
-                        <div class="operator-stats">
-                            <div class="operator-stat">
-                                <div class="operator-stat-value">38,691km</div>
-                                <div class="operator-stat-label">Network</div>
-                            </div>
-                            <div class="operator-stat">
-                                <div class="operator-stat-value">64%</div>
-                                <div class="operator-stat-label">On Time</div>
-                            </div>
-                            <div class="operator-stat">
-                                <div class="operator-stat-value">101B</div>
-                                <div class="operator-stat-label">Pass-km</div>
-                            </div>
+                        <div class="features-grid">
+                            <div class="feature-badge">WiFi</div>
+                            <div class="feature-badge">Electric plug</div>
+                            <div class="feature-badge">Bikes</div>
+                            <div class="feature-badge">Catering</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Journey Planner Section -->
-    <section id="journey" class="content-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Plan Your Perfect Journey</h2>
-                <p class="section-subtitle">Compare routes by speed, price, or experience</p>
-            </div>
-
-            <div class="journey-planner">
-                <form class="journey-form" onsubmit="searchJourney(event)">
-                    <div class="form-group">
-                        <label class="form-label">From</label>
-                        <input type="text" class="form-input" placeholder="e.g., Paris" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">To</label>
-                        <input type="text" class="form-input" placeholder="e.g., Berlin" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Priority</label>
-                        <select class="form-input">
-                            <option>Fastest</option>
-                            <option>Cheapest</option>
-                            <option>Most Comfortable</option>
-                            <option>Most Scenic</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">&nbsp;</label>
-                        <button type="submit" class="search-button">Search Routes</button>
-                    </div>
-                </form>
-
-                <div class="journey-results" id="journey-results">
-                    <!-- Results will be populated here -->
-                </div>
-            </div>
-
-            <div class="fun-fact">
-                <strong>Pro tip:</strong> Book German trains 3+ months ahead for prices as low as €19 between major cities!
-            </div>
-        </div>
-    </section>
-
-    <!-- Sustainability Section -->
-    <section id="sustainability" class="content-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">The Green Revolution</h2>
-                <p class="section-subtitle">How Europe's railways are fighting climate change</p>
-            </div>
-
-            <div class="extremes-grid">
-                <div class="extreme-card">
-                    <div class="extreme-icon">🇨🇭</div>
-                    <div class="extreme-value">100%</div>
-                    <div class="extreme-label">Switzerland</div>
-                    <div class="extreme-detail">Fully electrified network powered by renewable energy</div>
-                </div>
-                <!-- <div class="extreme-card">
-                    <div class="extreme-icon">🇳🇱</div>
-                    <div class="extreme-value">100%</div>
-                    <div class="extreme-label">Netherlands</div>
-                    <div class="extreme-detail">All electric trains run on wind power since 2017</div>
-                </div> -->
-                <div class="extreme-card">
-                    <div class="extreme-icon">🌙</div>
-                    <div class="extreme-value">Growing</div>
-                    <div class="extreme-label">Night Trains</div>
-                    <div class="extreme-detail">Revival of overnight services as eco-friendly alternative to flights</div>
-                </div>
-            </div>
-
-            <div class="fun-fact">
-                <strong>Climate win:</strong> If just 10% of European flights under 1000km switched to rail, 
-                we'd save 1.5 million tonnes of CO₂ annually - equivalent to removing 750,000 cars from the roads!
-            </div>
-        </div>
     </section>
 
     <!-- Country Info Panel -->
