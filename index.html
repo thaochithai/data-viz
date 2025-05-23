@@ -963,11 +963,38 @@
             try {
                 // Simulate data loading for demo
                 countryData = [
-                    { country: 'Switzerland', electrification_pct: 100, total_length_clean: 5177, passenger_km_clean: 21700 },
-                    { country: 'Netherlands', electrification_pct: 100, total_length_clean: 3223, passenger_km_clean: 18500 },
-                    { country: 'Germany', electrification_pct: 61, total_length_clean: 38691, passenger_km_clean: 101000 },
-                    { country: 'France', electrification_pct: 59, total_length_clean: 27593, passenger_km_clean: 116000 }
-                ];
+                    { country: 'Austria', electrification_pct: 74, total_length_clean: 5577, passenger_km_clean: 14019 },
+                    { country: 'Belgium', electrification_pct: 88, total_length_clean: 3629, passenger_km_clean: 245 },
+                    { country: 'Bulgaria', electrification_pct: 75, total_length_clean: 4025, passenger_km_clean: 1592 },
+                    { country: 'Switzerland', electrification_pct: 100, total_length_clean: 5318, passenger_km_clean: 20754 },
+                    { country: 'Czech Republic', electrification_pct: 34, total_length_clean: 9514, passenger_km_clean: 9996 },
+                    { country: 'Germany', electrification_pct: 55, total_length_clean: 38691, passenger_km_clean: 101408 },
+                    { country: 'Denmark', electrification_pct: 34, total_length_clean: 2448, passenger_km_clean: 6031 },
+                    { country: 'Estonia', electrification_pct: 12, total_length_clean: 1171, passenger_km_clean: 408 },
+                    { country: 'Greece', electrification_pct: 41, total_length_clean: 1822, passenger_km_clean: 673 },
+                    { country: 'Spain', electrification_pct: 67, total_length_clean: 16082, passenger_km_clean: 34632 },
+                    { country: 'Finland', electrification_pct: 58, total_length_clean: 5914, passenger_km_clean: 5199 },
+                    { country: 'France', electrification_pct: 61, total_length_clean: 27617, passenger_km_clean: 101316 },
+                    { country: 'Croatia', electrification_pct: 39, total_length_clean: 2617, passenger_km_clean: 1142 },
+                    { country: 'Hungary', electrification_pct: 45, total_length_clean: 7437, passenger_km_clean: 5435 },
+                    { country: 'Ireland', electrification_pct: 3, total_length_clean: 2045, passenger_km_clean: 2235 },
+                    { country: 'Italy', electrification_pct: 73, total_length_clean: 16832, passenger_km_clean: 54791 },
+                    { country: 'Lithuania', electrification_pct: 8, total_length_clean: 1924, passenger_km_clean: 392 },
+                    { country: 'Luxembourg', electrification_pct: 97, total_length_clean: 271, passenger_km_clean: 505 },
+                    { country: 'Latvia', electrification_pct: 14, total_length_clean: 1831, passenger_km_clean: 612 },
+                    { country: 'North Macedonia', electrification_pct: 34, total_length_clean: 683, passenger_km_clean: 32 },
+                    { country: 'Netherlands', electrification_pct: 75, total_length_clean: 3041, passenger_km_clean: 395 },
+                    { country: 'Norway', electrification_pct: 64, total_length_clean: 3903, passenger_km_clean: 3513 },
+                    { country: 'Poland', electrification_pct: 62, total_length_clean: 19539, passenger_km_clean: 25605 },
+                    { country: 'Portugal', electrification_pct: 71, total_length_clean: 2527, passenger_km_clean: 4829 },
+                    { country: 'Romania', electrification_pct: 38, total_length_clean: 10611, passenger_km_clean: 5978 },
+                    { country: 'Sweden', electrification_pct: 75, total_length_clean: 10906, passenger_km_clean: 13308 },
+                    { country: 'Slovenia', electrification_pct: 50, total_length_clean: 1208, passenger_km_clean: 742 },
+                    { country: 'Slovakia', electrification_pct: 44, total_length_clean: 3631, passenger_km_clean: 3543 },
+                    { country: 'Turkey', electrification_pct: 57, total_length_clean: 11417, passenger_km_clean: 6245 },
+                    { country: 'United Kingdom', electrification_pct: 38, total_length_clean: 16433, passenger_km_clean: 16200 }
+                    ];
+
                 
                 // Initialize map after data loads
                 initializeMap();
@@ -1084,50 +1111,6 @@
 
         function closeCountryPanel() {
             document.querySelector('.country-info-panel').classList.remove('active');
-        }
-
-        // Journey search
-        function searchJourney(event) {
-            event.preventDefault();
-            const results = document.getElementById('journey-results');
-            
-            results.innerHTML = `
-                <div class="loading">Searching for the best routes...</div>
-            `;
-            
-            // Simulate search delay
-            setTimeout(() => {
-                results.innerHTML = `
-                    <div class="journey-option" style="background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%); border: 2px solid #c8e6c9; border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="color: #2d9f5d; margin-bottom: 0.5rem;">Fastest Option</h4>
-                            <p style="color: #4a7c59;">TGV via SNCF - 2h 15min</p>
-                            <div class="features-grid" style="margin-top: 0.5rem;">
-                                <div class="feature-badge">320 km/h</div>
-                                <div class="feature-badge">€89</div>
-                                <div class="feature-badge">WiFi</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <button class="search-button" style="margin: 0;">Book Now</button>
-                        </div>
-                    </div>
-                    <div class="journey-option" style="background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%); border: 2px solid #c8e6c9; border-radius: 15px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="color: #2d9f5d; margin-bottom: 0.5rem;">Best Value</h4>
-                            <p style="color: #4a7c59;">FlixTrain - 8h 30min</p>
-                            <div class="features-grid" style="margin-top: 0.5rem;">
-                                <div class="feature-badge">120 km/h</div>
-                                <div class="feature-badge">€29</div>
-                                <div class="feature-badge">Power outlets</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <button class="search-button" style="margin: 0;">Book Now</button>
-                        </div>
-                    </div>
-                `;
-            }, 1500);
         }
 
         // Initialize on load
