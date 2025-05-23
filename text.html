@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+//<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>European railway analysis</title>
+    <title>The Great European Rail Adventure - An Interactive Journey</title>
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -524,6 +525,133 @@
             opacity: 1;
         }
 
+        /* Chart Containers */
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            border: 2px solid #e8f5e9;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            color: #1a5a3a;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .chart-subtitle {
+            color: #4a7c59;
+            margin-bottom: 1.5rem;
+        }
+
+        canvas {
+            max-height: 400px;
+        }
+
+        /* Analysis Cards */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .analysis-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid #e8f5e9;
+            transition: all 0.3s;
+        }
+
+        .analysis-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(45, 159, 93, 0.1);
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            margin: 2rem 0;
+        }
+
+        .comparison-table thead {
+            background: #2d9f5d;
+            color: white;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e8f5e9;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: #f0f9f4;
+        }
+
+        .comparison-table .highlight {
+            background: #e8f5e9;
+            font-weight: 700;
+            color: #2d9f5d;
+        }
+
+        /* Interactive Controls */
+        .controls-panel {
+            background: #f0f9f4;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            color: #4a7c59;
+            font-weight: 600;
+        }
+
+        .control-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #c8e6c9;
+            border-radius: 8px;
+            background: white;
+            color: #1a5a3a;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .control-select:hover,
+        .control-select:focus {
+            border-color: #2d9f5d;
+            outline: none;
+        }
+
         /* Loading and Error States */
         .loading {
             display: flex;
@@ -592,6 +720,7 @@
                 <a href="#extremes" class="nav-link">Extremes</a>
                 <a href="#rail-nations" class="nav-link">Rail Nations</a>
                 <a href="#operators" class="nav-link">Top Operators</a>
+                <a href="#analytics" class="nav-link">Analytics</a>
                 <a href="#journey" class="nav-link">Plan Journey</a>
                 <a href="#sustainability" class="nav-link">Sustainability</a>
             </div>
@@ -670,8 +799,8 @@
             </svg>
         </div>
         <div class="hero-content">
-            <h1>European railways</h1>
-            <p class="hero-subtitle">Explore the European railways and comparing the <br> passenger experience across European train operators</p>
+            <h1>The Great European Rail Adventure</h1>
+            <p class="hero-subtitle">From 19 km/h mountain railways to 274 km/h speed demons</p>
             <div class="scroll-indicator">
                 <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
                     <path d="M15 20L10 15L11.4 13.6L15 17.2L18.6 13.6L20 15L15 20Z" fill="#2d9f5d"/>
@@ -684,38 +813,51 @@
     <section id="extremes" class="content-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Key highlights of European railway</h2>
+                <h2 class="section-title">Europe's Railway Extremes</h2>
+                <p class="section-subtitle">Where speed meets tradition, and luxury clashes with value</p>
             </div>
 
             <div class="extremes-grid">
                 <div class="extreme-card">
-                    <div class="extreme-value">238,664 km</div>
-                    <div class="extreme-label">Total train line length</div>
+                    <div class="extreme-icon">🏎️</div>
+                    <div class="extreme-value">274 km/h</div>
+                    <div class="extreme-label">Speed Champion</div>
+                    <div class="extreme-detail">Ouigo's Paris-Bordeaux route blazes through France at TGV speeds</div>
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-value">441,775 km/h</div>
-                    <div class="extreme-label">million passenger per km</div>
+                    <div class="extreme-icon">🐌</div>
+                    <div class="extreme-value">19 km/h</div>
+                    <div class="extreme-label">Scenic Crawler</div>
+                    <div class="extreme-detail">Greece's Diakopto-Kalavryta rack railway - slow is the new fast</div>
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-value">53%</div>
-                    <div class="extreme-label">Train line lenghth is electrified</div>
+                    <div class="extreme-icon">💸</div>
+                    <div class="extreme-value">€1.04/km</div>
+                    <div class="extreme-label">Premium Price</div>
+                    <div class="extreme-detail">London-Milton Keynes - where your wallet travels light</div>
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-value">77%</div>
-                    <div class="extreme-label">Average punctuality</div>
+                    <div class="extreme-icon">🎉</div>
+                    <div class="extreme-value">€0.01/km</div>
+                    <div class="extreme-label">Best Value</div>
+                    <div class="extreme-detail">Berlin-Cologne - German efficiency at its finest</div>
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-value">37%</div>
-                    <div class="extreme-label">Passengers travel with bike</div>
+                    <div class="extreme-icon">⚡</div>
+                    <div class="extreme-value">100%</div>
+                    <div class="extreme-label">Fully Electric</div>
+                    <div class="extreme-detail">Switzerland - where every train runs on clean energy</div>
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-value">115,559 km/h</div>
-                    <div class="extreme-label">Average speed </div>
+                    <div class="extreme-icon">⏰</div>
+                    <div class="extreme-value">90%</div>
+                    <div class="extreme-label">Punctuality King</div>
+                    <div class="extreme-detail">SBB - Swiss precision isn't just for watches</div>
                 </div>
             </div>
 
@@ -741,12 +883,24 @@
             <div class="route-stats">
                 <div class="route-stat-card">
                     <div class="extreme-value">30</div>
-                    <div class="extreme-label">Countries connected</div>
+                    <div class="extreme-label">Countries Connected</div>
                 </div>
                 <div class="route-stat-card">
                     <div class="extreme-value">254</div>
-                    <div class="extreme-label">International routes</div>
+                    <div class="extreme-label">International Routes</div>
                 </div>
+                <div class="route-stat-card">
+                    <div class="extreme-value">52.9%</div>
+                    <div class="extreme-label">Average Electrification</div>
+                </div>
+                <div class="route-stat-card">
+                    <div class="extreme-value">7.5x</div>
+                    <div class="extreme-label">Less CO₂ than Flying</div>
+                </div>
+            </div>
+
+            <div class="fun-fact">
+                <strong>Green fact:</strong> European railways produce 7.5 times less CO₂ than aviation and 4 times less than cars for the same journey!
             </div>
         </div>
     </section>
@@ -879,6 +1033,205 @@
         </div>
     </section>
 
+    <!-- Analytics Section -->
+    <section id="analytics" class="content-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Data-Driven Rail Insights</h2>
+                <p class="section-subtitle">Comprehensive analysis of European railway performance</p>
+            </div>
+
+            <!-- Route Analysis Charts -->
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">Speed vs Price Analysis</h3>
+                    <p class="chart-subtitle">Finding the sweet spot between journey time and cost</p>
+                    <canvas id="speedPriceChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Top 10 Routes by Speed</h3>
+                    <p class="chart-subtitle">Europe's fastest railway connections</p>
+                    <canvas id="topSpeedChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Country Comparison -->
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label class="control-label">Compare Countries</label>
+                    <select class="control-select" id="countrySelect" multiple style="height: 100px;">
+                        <option value="France" selected>France</option>
+                        <option value="Germany" selected>Germany</option>
+                        <option value="Spain" selected>Spain</option>
+                        <option value="Italy">Italy</option>
+                        <option value="Switzerland">Switzerland</option>
+                        <option value="Netherlands">Netherlands</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="Austria">Austria</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Metric</label>
+                    <select class="control-select" id="metricSelect">
+                        <option value="electrification">Electrification %</option>
+                        <option value="speed">Average Speed</option>
+                        <option value="punctuality">Punctuality</option>
+                        <option value="price">Avg Price per km</option>
+                    </select>
+                </div>
+                <button class="search-button" onclick="updateCountryComparison()">Update Chart</button>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">Country Performance Comparison</h3>
+                    <p class="chart-subtitle">Multi-metric analysis of national rail systems</p>
+                    <canvas id="countryRadarChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Network Electrification Progress</h3>
+                    <p class="chart-subtitle">Percentage of electrified tracks by country</p>
+                    <canvas id="electrificationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Route Comparison Table -->
+            <h3 class="chart-title" style="margin-top: 3rem;">Popular Route Comparison</h3>
+            <div style="overflow-x: auto;">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Route</th>
+                            <th>Operator</th>
+                            <th>Distance (km)</th>
+                            <th>Time</th>
+                            <th>Speed (km/h)</th>
+                            <th>Price (€)</th>
+                            <th>€ per km</th>
+                            <th>CO₂ Saved vs Flight</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routeComparisonBody">
+                        <tr>
+                            <td>Paris - Lyon</td>
+                            <td>SNCF TGV</td>
+                            <td>466</td>
+                            <td>1h 57m</td>
+                            <td class="highlight">239</td>
+                            <td>€65</td>
+                            <td>€0.14</td>
+                            <td style="color: #2d9f5d;">89%</td>
+                        </tr>
+                        <tr>
+                            <td>Madrid - Barcelona</td>
+                            <td>Renfe AVE</td>
+                            <td>621</td>
+                            <td>2h 30m</td>
+                            <td class="highlight">248</td>
+                            <td>€89</td>
+                            <td>€0.14</td>
+                            <td style="color: #2d9f5d;">91%</td>
+                        </tr>
+                        <tr>
+                            <td>Berlin - Munich</td>
+                            <td>DB ICE</td>
+                            <td>623</td>
+                            <td>3h 55m</td>
+                            <td>159</td>
+                            <td>€49</td>
+                            <td class="highlight">€0.08</td>
+                            <td style="color: #2d9f5d;">87%</td>
+                        </tr>
+                        <tr>
+                            <td>Milan - Rome</td>
+                            <td>Trenitalia</td>
+                            <td>568</td>
+                            <td>2h 55m</td>
+                            <td>195</td>
+                            <td>€59</td>
+                            <td>€0.10</td>
+                            <td style="color: #2d9f5d;">88%</td>
+                        </tr>
+                        <tr>
+                            <td>Amsterdam - Brussels</td>
+                            <td>Thalys</td>
+                            <td>173</td>
+                            <td>1h 52m</td>
+                            <td>93</td>
+                            <td>€35</td>
+                            <td>€0.20</td>
+                            <td style="color: #2d9f5d;">82%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Analysis Cards -->
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h4 style="color: #1a5a3a; margin-bottom: 1rem;">🏆 Speed Champion Routes</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e8f5e9;">
+                            <strong>1. Paris-Bordeaux:</strong> 274 km/h (Ouigo)
+                        </li>
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e8f5e9;">
+                            <strong>2. Madrid-Barcelona:</strong> 248 km/h (Renfe)
+                        </li>
+                        <li style="padding: 0.5rem 0;">
+                            <strong>3. Paris-Lyon:</strong> 239 km/h (SNCF)
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h4 style="color: #1a5a3a; margin-bottom: 1rem;">💰 Best Value Routes</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e8f5e9;">
+                            <strong>1. Berlin-Cologne:</strong> €0.01/km (FlixTrain)
+                        </li>
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e8f5e9;">
+                            <strong>2. Prague-Budapest:</strong> €0.03/km (RegioJet)
+                        </li>
+                        <li style="padding: 0.5rem 0;">
+                            <strong>3. Warsaw-Krakow:</strong> €0.04/km (PKP)
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h4 style="color: #1a5a3a; margin-bottom: 1rem;">🌱 Greenest Networks</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e8f5e9;">
+                            <strong>1. Switzerland:</strong> 100% electric + renewable
+                        </li>
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e8f5e9;">
+                            <strong>2. Netherlands:</strong> 100% wind powered
+                        </li>
+                        <li style="padding: 0.5rem 0;">
+                            <strong>3. Sweden:</strong> 95% renewable energy
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">Journey Time vs Distance</h3>
+                    <p class="chart-subtitle">Efficiency analysis of major routes</p>
+                    <canvas id="timeDistanceChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Price Trends by Distance</h3>
+                    <p class="chart-subtitle">How ticket prices scale with journey length</p>
+                    <canvas id="priceDistanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Sustainability Section -->
     <section id="sustainability" class="content-section">
         <div class="container">
@@ -894,12 +1247,12 @@
                     <div class="extreme-label">Switzerland</div>
                     <div class="extreme-detail">Fully electrified network powered by renewable energy</div>
                 </div>
-                <!-- <div class="extreme-card">
+                <div class="extreme-card">
                     <div class="extreme-icon">🇳🇱</div>
                     <div class="extreme-value">100%</div>
                     <div class="extreme-label">Netherlands</div>
                     <div class="extreme-detail">All electric trains run on wind power since 2017</div>
-                </div> -->
+                </div>
                 <div class="extreme-card">
                     <div class="extreme-icon">🌙</div>
                     <div class="extreme-value">Growing</div>
@@ -1086,52 +1439,339 @@
             document.querySelector('.country-info-panel').classList.remove('active');
         }
 
-        // Journey search
-        function searchJourney(event) {
-            event.preventDefault();
-            const results = document.getElementById('journey-results');
-            
-            results.innerHTML = `
-                <div class="loading">Searching for the best routes...</div>
-            `;
-            
-            // Simulate search delay
-            setTimeout(() => {
-                results.innerHTML = `
-                    <div class="journey-option" style="background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%); border: 2px solid #c8e6c9; border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="color: #2d9f5d; margin-bottom: 0.5rem;">Fastest Option</h4>
-                            <p style="color: #4a7c59;">TGV via SNCF - 2h 15min</p>
-                            <div class="features-grid" style="margin-top: 0.5rem;">
-                                <div class="feature-badge">320 km/h</div>
-                                <div class="feature-badge">€89</div>
-                                <div class="feature-badge">WiFi</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <button class="search-button" style="margin: 0;">Book Now</button>
-                        </div>
-                    </div>
-                    <div class="journey-option" style="background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%); border: 2px solid #c8e6c9; border-radius: 15px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="color: #2d9f5d; margin-bottom: 0.5rem;">Best Value</h4>
-                            <p style="color: #4a7c59;">FlixTrain - 8h 30min</p>
-                            <div class="features-grid" style="margin-top: 0.5rem;">
-                                <div class="feature-badge">120 km/h</div>
-                                <div class="feature-badge">€29</div>
-                                <div class="feature-badge">Power outlets</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <button class="search-button" style="margin: 0;">Book Now</button>
-                        </div>
-                    </div>
-                `;
-            }, 1500);
-        }
+        function initializeCharts() {
+            // Speed vs Price Scatter Chart
+            const speedPriceCtx = document.getElementById('speedPriceChart').getContext('2d');
+            new Chart(speedPriceCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'High-Speed Rail',
+                        data: [
+                            {x: 274, y: 0.12, label: 'Paris-Bordeaux'},
+                            {x: 248, y: 0.14, label: 'Madrid-Barcelona'},
+                            {x: 239, y: 0.14, label: 'Paris-Lyon'},
+                            {x: 217, y: 0.18, label: 'London-Paris'},
+                            {x: 195, y: 0.10, label: 'Milan-Rome'}
+                        ],
+                        backgroundColor: 'rgba(45, 159, 93, 0.6)',
+                        borderColor: '#2d9f5d',
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 10
+                    }, {
+                        label: 'Conventional Rail',
+                        data: [
+                            {x: 159, y: 0.08, label: 'Berlin-Munich'},
+                            {x: 120, y: 0.06, label: 'Vienna-Salzburg'},
+                            {x: 93, y: 0.20, label: 'Amsterdam-Brussels'},
+                            {x: 80, y: 0.04, label: 'Prague-Budapest'}
+                        ],
+                        backgroundColor: 'rgba(200, 230, 201, 0.6)',
+                        borderColor: '#81c784',
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 10
+                    }, {
+                        label: 'Budget Rail',
+                        data: [
+                            {x: 120, y: 0.01, label: 'Berlin-Cologne'},
+                            {x: 90, y: 0.03, label: 'Prague-Vienna'},
+                            {x: 85, y: 0.04, label: 'Warsaw-Krakow'}
+                        ],
+                        backgroundColor: 'rgba(255, 193, 7, 0.6)',
+                        borderColor: '#ffa000',
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw.label + ': ' + context.parsed.x + ' km/h, €' + context.parsed.y + '/km';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Average Speed (km/h)',
+                                color: '#4a7c59',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Price per km (€)',
+                                color: '#4a7c59',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                        }
+                    }
+                }
+            });
 
-        // Initialize on load
-        window.addEventListener('load', loadData);
+            // Top Speed Bar Chart
+            const topSpeedCtx = document.getElementById('topSpeedChart').getContext('2d');
+            new Chart(topSpeedCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Paris-Bordeaux', 'Madrid-Barcelona', 'Paris-Lyon', 'Frankfurt-Cologne', 'Milan-Rome', 
+                             'Brussels-London', 'Berlin-Munich', 'Amsterdam-Paris', 'Vienna-Budapest', 'Warsaw-Gdansk'],
+                    datasets: [{
+                        label: 'Average Speed (km/h)',
+                        data: [274, 248, 239, 217, 195, 186, 159, 142, 120, 115],
+                        backgroundColor: [
+                            '#1a5a3a', '#2d9f5d', '#4ac77d', '#66bb6a', '#81c784',
+                            '#a5d6a7', '#c8e6c9', '#e8f5e9', '#f1f8e9', '#f9fbe7'
+                        ],
+                        borderColor: '#2d9f5d',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Average Speed (km/h)',
+                                color: '#4a7c59',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Country Radar Chart
+            const countryRadarCtx = document.getElementById('countryRadarChart').getContext('2d');
+            window.countryRadarChart = new Chart(countryRadarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Electrification %', 'Avg Speed', 'Punctuality', 'Network Size', 'Price/km'],
+                    datasets: [{
+                        label: 'France',
+                        data: [59, 85, 87, 75, 70],
+                        backgroundColor: 'rgba(45, 159, 93, 0.2)',
+                        borderColor: '#2d9f5d',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#2d9f5d'
+                    }, {
+                        label: 'Germany',
+                        data: [61, 70, 64, 95, 85],
+                        backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                        borderColor: '#ffa000',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ffa000'
+                    }, {
+                        label: 'Spain',
+                        data: [72, 80, 82, 65, 75],
+                        backgroundColor: 'rgba(244, 67, 54, 0.2)',
+                        borderColor: '#f44336',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#f44336'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { stepSize: 20 },
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                        }
+                    }
+                }
+            });
+
+            // Electrification Chart
+            const electrificationCtx = document.getElementById('electrificationChart').getContext('2d');
+            new Chart(electrificationCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Switzerland', 'Netherlands', 'Belgium', 'Sweden', 'Austria', 'Italy', 'Germany', 'France', 'Spain', 'UK'],
+                    datasets: [{
+                        data: [100, 100, 86, 75, 73, 72, 61, 59, 55, 42],
+                        backgroundColor: [
+                            '#1a5a3a', '#2d9f5d', '#4ac77d', '#66bb6a', '#81c784',
+                            '#a5d6a7', '#c8e6c9', '#e8f5e9', '#f1f8e9', '#f9fbe7'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 15,
+                                font: { size: 12 },
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    return data.labels.map((label, i) => ({
+                                        text: label + ' - ' + data.datasets[0].data[i] + '%',
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        index: i
+                                    }));
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Time vs Distance Chart
+            const timeDistanceCtx = document.getElementById('timeDistanceChart').getContext('2d');
+            new Chart(timeDistanceCtx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'High-Speed Rail',
+                        data: [
+                            {x: 466, y: 117, r: 15, label: 'Paris-Lyon'},
+                            {x: 621, y: 150, r: 15, label: 'Madrid-Barcelona'},
+                            {x: 515, y: 120, r: 15, label: 'Paris-Bordeaux'},
+                            {x: 568, y: 175, r: 15, label: 'Milan-Rome'}
+                        ],
+                        backgroundColor: 'rgba(45, 159, 93, 0.6)',
+                        borderColor: '#2d9f5d'
+                    }, {
+                        label: 'Conventional',
+                        data: [
+                            {x: 623, y: 235, r: 12, label: 'Berlin-Munich'},
+                            {x: 173, y: 112, r: 12, label: 'Amsterdam-Brussels'},
+                            {x: 305, y: 180, r: 12, label: 'Vienna-Salzburg'}
+                        ],
+                        backgroundColor: 'rgba(255, 193, 7, 0.6)',
+                        borderColor: '#ffa000'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Distance (km)',
+                                color: '#4a7c59',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Journey Time (minutes)',
+                                color: '#4a7c59',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw.label + ': ' + context.parsed.x + ' km in ' + 
+                                           Math.floor(context.parsed.y / 60) + 'h ' + (context.parsed.y % 60) + 'm';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Price vs Distance Chart
+            const priceDistanceCtx = document.getElementById('priceDistanceChart').getContext('2d');
+            new Chart(priceDistanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['100km', '200km', '300km', '400km', '500km', '600km', '700km', '800km'],
+                    datasets: [{
+                        label: 'Premium (TGV/ICE)',
+                        data: [25, 45, 65, 85, 105, 125, 145, 165],
+                        borderColor: '#2d9f5d',
+                        backgroundColor: 'rgba(45, 159, 93, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4
+                    }, {
+                        label: 'Standard',
+                        data: [15, 28, 40, 52, 65, 78, 90, 102],
+                        borderColor: '#ffa000',
+                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4
+                    }, {
+                        label: 'Budget',
+                        data: [9, 15, 22, 29, 35, 42, 49, 55],
+                        borderColor: '#f44336',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Distance',
+                                color: '#4a7c59',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Average Price (€)',
+                                color: '#4a7c59',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                        }
+                    }
+                }
+            });
+        }
+    // Initialize on load
+    window.addEventListener('load', loadData);
     </script>
+    
 </body>
 </html>
