@@ -89,51 +89,49 @@
             color: #2d9f5d;
         }
 
-        /* Hero Section with Banner */
+ /* Hero Section with Banner */
         .hero {
             width: 100%;
-            overflow: hidden; /* Prevents content from spilling out */
+            overflow: hidden;
+            position: relative; /* Add this for positioning */
         }
 
         .hero-banner {
             width: 100%;
-            max-width: 100%;
+            position: relative; /* Add this */
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            align-items: center; /* Center vertically */
         }
 
         .hero-banner img {
             width: 100%;
-            max-width: 100%;
             height: auto;
-            object-fit: cover; /* or 'contain' depending on desired behavior */
-            margin-bottom: 2rem;
+            object-fit: cover;
         }
 
+        /* Position title on the left */
+        .hero h1 {
+            position: absolute;
+            left: 2rem; /* Distance from left edge */
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%); /* Perfect vertical centering */
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            color: #1a5a3a;
+            letter-spacing: -2px;
+            margin: 0; /* Remove default margin */
+            z-index: 10;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        /* Remove unused styles */
         .hero-banner svg {
             width: 100%;
             height: auto;
         }
 
-        .hero-content {
-            text-align: center;
-            z-index: 10;
-            padding: 2rem;
-            max-width: 900px;
-            margin-top: 350px;
-        }
-
-        .hero h1 {
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            font-weight: 900;
-            margin-bottom: 1.5rem;
-            color: #1a5a3a;
-            letter-spacing: -2px;
-            animation: fadeInUp 1s ease-out;
-        }
-
         .hero-subtitle {
+            /* Keep if you're using subtitle */
             font-size: clamp(1.2rem, 3vw, 1.8rem);
             color: #2d6a4f;
             margin-bottom: 3rem;
@@ -677,21 +675,20 @@
         }
 
         /* Responsive Design */
+        /* Responsive Design */
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
             }
 
             .hero h1 {
+                font-size: clamp(1.8rem, 6vw, 3rem); /* Smaller on mobile */
+                left: 1rem; /* Closer to edge on mobile */
                 letter-spacing: -1px;
             }
 
             .hero-banner {
                 width: 100%;
-            }
-
-            .hero-content {
-                margin-top: 250px;
             }
 
             .country-info-panel {
@@ -726,7 +723,7 @@
     <!-- Hero Section with Banner -->
     <section class="hero">
         <div class="hero-banner">
-            <img src="./header/heading_2.png" alt="Train Banner" style="max-width: 100%; height: auto; margin-bottom: 2rem;">
+            <img src="./header/heading_2.png" alt="Train Banner">
             <h1>European railway analysis</h1>
         </div>
     </section>
@@ -934,77 +931,108 @@
                 </div>
             </div>
 
-            <!-- Route Comparison Table -->
-            <h3 class="chart-title" style="margin-top: 3rem;">Popular route comparison</h3>
+            <!-- Operator Comparison Table -->
+            <h3 class="chart-title" style="margin-top: 3rem;">Major European Railway Operators Comparison</h3>
             <div style="overflow-x: auto;">
                 <table class="comparison-table">
                     <thead>
                         <tr>
-                            <th>Route</th>
                             <th>Operator</th>
-                            <th>Distance (km)</th>
-                            <th>Time</th>
-                            <th>Speed (km/h)</th>
-                            <th>Price (€)</th>
-                            <th>€ per km</th>
-                            <th>CO₂ Saved vs Flight</th>
+                            <th>Country</th>
+                            <th>Avg Speed (km/h)</th>
+                            <th>Punctuality (%)</th>
+                            <th>Avg Price (€/km)</th>
+                            <th>Passenger-km (Billions)</th>
+                            <th>Service Rating</th>
                         </tr>
                     </thead>
-                    <tbody id="routeComparisonBody">
+                    <tbody id="operatorComparisonBody">
                         <tr>
-                            <td>Paris - Lyon</td>
-                            <td>SNCF TGV</td>
-                            <td>466</td>
-                            <td>1h 57m</td>
-                            <td class="highlight">239</td>
-                            <td>€65</td>
+                            <td><strong>SBB</strong></td>
+                            <td>🇨🇭 Switzerland</td>
+                            <td>160</td>
+                            <td class="highlight">90%</td>
                             <td>€0.14</td>
-                            <td style="color: #2d9f5d;">89%</td>
+                            <td>20.8</td>
+                            <td style="color: #2d9f5d;">⭐⭐⭐⭐⭐</td>
                         </tr>
                         <tr>
-                            <td>Madrid - Barcelona</td>
-                            <td>Renfe AVE</td>
-                            <td>621</td>
-                            <td>2h 30m</td>
-                            <td class="highlight">248</td>
-                            <td>€89</td>
-                            <td>€0.14</td>
-                            <td style="color: #2d9f5d;">91%</td>
+                            <td><strong>SNCF</strong></td>
+                            <td>🇫🇷 France</td>
+                            <td class="highlight">217</td>
+                            <td>87%</td>
+                            <td>€0.15</td>
+                            <td>101.3</td>
+                            <td style="color: #2d9f5d;">⭐⭐⭐⭐⭐</td>
                         </tr>
                         <tr>
-                            <td>Berlin - Munich</td>
-                            <td>DB ICE</td>
-                            <td>623</td>
-                            <td>3h 55m</td>
-                            <td>159</td>
-                            <td>€49</td>
-                            <td class="highlight">€0.08</td>
-                            <td style="color: #2d9f5d;">87%</td>
+                            <td><strong>DB</strong></td>
+                            <td>🇩🇪 Germany</td>
+                            <td>165</td>
+                            <td>64%</td>
+                            <td>€0.18</td>
+                            <td>101.4</td>
+                            <td style="color: #ffa000;">⭐⭐⭐⭐</td>
                         </tr>
                         <tr>
-                            <td>Milan - Rome</td>
-                            <td>Trenitalia</td>
-                            <td>568</td>
-                            <td>2h 55m</td>
+                            <td><strong>Renfe</strong></td>
+                            <td>🇪🇸 Spain</td>
                             <td>195</td>
-                            <td>€59</td>
-                            <td>€0.10</td>
-                            <td style="color: #2d9f5d;">88%</td>
+                            <td>82%</td>
+                            <td>€0.12</td>
+                            <td>34.6</td>
+                            <td style="color: #2d9f5d;">⭐⭐⭐⭐⭐</td>
                         </tr>
                         <tr>
-                            <td>Amsterdam - Brussels</td>
-                            <td>Thalys</td>
-                            <td>173</td>
-                            <td>1h 52m</td>
-                            <td>93</td>
-                            <td>€35</td>
-                            <td>€0.20</td>
-                            <td style="color: #2d9f5d;">82%</td>
+                            <td><strong>Trenitalia</strong></td>
+                            <td>🇮🇹 Italy</td>
+                            <td>175</td>
+                            <td>78%</td>
+                            <td>€0.10</td>
+                            <td>54.8</td>
+                            <td style="color: #2d9f5d;">⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NS</strong></td>
+                            <td>🇳🇱 Netherlands</td>
+                            <td>140</td>
+                            <td>85%</td>
+                            <td>€0.22</td>
+                            <td>17.2</td>
+                            <td style="color: #2d9f5d;">⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ÖBB</strong></td>
+                            <td>🇦🇹 Austria</td>
+                            <td>145</td>
+                            <td>88%</td>
+                            <td>€0.14</td>
+                            <td>14.0</td>
+                            <td style="color: #2d9f5d;">⭐⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SJ</strong></td>
+                            <td>🇸🇪 Sweden</td>
+                            <td>130</td>
+                            <td>83%</td>
+                            <td>€0.16</td>
+                            <td>13.3</td>
+                            <td style="color: #2d9f5d;">⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Network Rail</strong></td>
+                            <td>🇬🇧 United Kingdom</td>
+                            <td>135</td>
+                            <td>68%</td>
+                            <td>€0.25</td>
+                            <td>16.2</td>
+                            <td style="color: #ffa000;">⭐⭐⭐</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+
     </section>
 
     <!-- Country Info Panel -->
@@ -1353,38 +1381,67 @@
 
         // Initialize all charts
         function initializeCharts() {
-            // Speed vs Price Scatter Chart
+            // Speed vs Price by Country Scatter Chart
             const speedPriceCtx = document.getElementById('speedPriceChart').getContext('2d');
             new Chart(speedPriceCtx, {
                 type: 'scatter',
                 data: {
                     datasets: [{
-                        label: 'High-Speed Rail',
+                        label: 'Western Europe',
                         data: [
-                            {x: 274, y: 0.12},
-                            {x: 248, y: 0.14},
-                            {x: 239, y: 0.14},
-                            {x: 217, y: 0.18},
-                            {x: 195, y: 0.10}
+                            {x: 180, y: 0.15, country: 'France'},
+                            {x: 165, y: 0.18, country: 'Germany'}, 
+                            {x: 195, y: 0.12, country: 'Spain'},
+                            {x: 175, y: 0.16, country: 'Italy'},
+                            {x: 140, y: 0.22, country: 'Netherlands'},
+                            {x: 160, y: 0.14, country: 'Switzerland'},
+                            {x: 125, y: 0.20, country: 'Belgium'},
+                            {x: 145, y: 0.19, country: 'Austria'}
                         ],
-                        backgroundColor: 'rgba(45, 159, 93, 0.6)',
+                        backgroundColor: 'rgba(45, 159, 93, 0.7)',
                         borderColor: '#2d9f5d',
                         borderWidth: 2,
-                        pointRadius: 8,
-                        pointHoverRadius: 10
+                        pointRadius: 12,
+                        pointHoverRadius: 14
                     }, {
-                        label: 'Conventional Rail',
+                        label: 'Nordic Countries',
                         data: [
-                            {x: 159, y: 0.08},
-                            {x: 120, y: 0.06},
-                            {x: 93, y: 0.20},
-                            {x: 80, y: 0.04}
+                            {x: 130, y: 0.16, country: 'Sweden'},
+                            {x: 120, y: 0.18, country: 'Norway'},
+                            {x: 115, y: 0.15, country: 'Finland'},
+                            {x: 125, y: 0.17, country: 'Denmark'}
                         ],
-                        backgroundColor: 'rgba(200, 230, 201, 0.6)',
-                        borderColor: '#81c784',
+                        backgroundColor: 'rgba(33, 150, 243, 0.7)',
+                        borderColor: '#2196f3',
                         borderWidth: 2,
-                        pointRadius: 8,
-                        pointHoverRadius: 10
+                        pointRadius: 12,
+                        pointHoverRadius: 14
+                    }, {
+                        label: 'Eastern Europe',
+                        data: [
+                            {x: 110, y: 0.08, country: 'Poland'},
+                            {x: 105, y: 0.06, country: 'Czech Republic'},
+                            {x: 95, y: 0.05, country: 'Hungary'},
+                            {x: 85, y: 0.04, country: 'Romania'},
+                            {x: 90, y: 0.07, country: 'Slovakia'},
+                            {x: 100, y: 0.09, country: 'Croatia'}
+                        ],
+                        backgroundColor: 'rgba(255, 152, 0, 0.7)',
+                        borderColor: '#ff9800',
+                        borderWidth: 2,
+                        pointRadius: 12,
+                        pointHoverRadius: 14
+                    }, {
+                        label: 'UK & Ireland',
+                        data: [
+                            {x: 135, y: 0.25, country: 'United Kingdom'},
+                            {x: 110, y: 0.12, country: 'Ireland'}
+                        ],
+                        backgroundColor: 'rgba(156, 39, 176, 0.7)',
+                        borderColor: '#9c27b0',
+                        borderWidth: 2,
+                        pointRadius: 12,
+                        pointHoverRadius: 14
                     }]
                 },
                 options: {
@@ -1393,6 +1450,14 @@
                     plugins: {
                         title: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const point = context.raw;
+                                    return `${point.country}: ${context.parsed.x} km/h, €${context.parsed.y}/km`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -1403,20 +1468,25 @@
                                 color: '#4a7c59',
                                 font: { size: 14, weight: 'bold' }
                             },
-                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' },
+                            min: 70,
+                            max: 210
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: 'Price per km (€)',
+                                text: 'Average Price per km (€)',
                                 color: '#4a7c59',
                                 font: { size: 14, weight: 'bold' }
                             },
-                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
+                            grid: { color: 'rgba(200, 230, 201, 0.2)' },
+                            min: 0,
+                            max: 0.3
                         }
                     }
                 }
             });
+
 
             // Top Speed Bar Chart
             const topSpeedCtx = document.getElementById('topSpeedChart').getContext('2d');
