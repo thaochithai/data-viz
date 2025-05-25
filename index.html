@@ -688,7 +688,7 @@
             }
 
             .hero-banner {
-                width: 400px;
+                width: 768px;
             }
 
             .hero-content {
@@ -732,9 +732,8 @@
         </div>
     </section>
     
-
-    <!-- The Extremes Section -->
-      <section id="extremes" class="content-section">
+   <!-- The Extremes Section -->
+    <section id="extremes" class="content-section">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Key highlights of European railway</h2>
@@ -747,13 +746,13 @@
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-value">441,775 km/h</div>
-                    <div class="extreme-label">million passenger per km</div>
+                    <div class="extreme-value">441,775</div>
+                    <div class="extreme-label">Million passenger per km</div>
                 </div>
 
                 <div class="extreme-card">
                     <div class="extreme-value">53%</div>
-                    <div class="extreme-label">Train line lenghth is electrified</div>
+                    <div class="extreme-label">Train line length is electrified</div>
                 </div>
 
                 <div class="extreme-card">
@@ -767,8 +766,8 @@
                 </div>
 
                 <div class="extreme-card">
-                    <div class="extreme-value">115,559 km/h</div>
-                    <div class="extreme-label">Average speed </div>
+                    <div class="extreme-value">115 km/h</div>
+                    <div class="extreme-label">Average speed</div>
                 </div>
             </div>
 
@@ -780,7 +779,7 @@
     </section>
 
     <!-- Rail Nations Section -->
- <section id="rail-nations" class="content-section">
+    <section id="rail-nations" class="content-section">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Rail network of Europe</h2>
@@ -805,9 +804,8 @@
                 <div class="extreme-card">
                     <div class="extreme-icon">🇨🇭</div>
                     <div class="extreme-value">100%</div>
-                    <div class="extreme-label">Switzerland</div>
-                    <div class="extreme-detail">Fully electrified network powered by renewable energy</div>
-             </div>
+                    <div class="extreme-detail">Switzerland - Fully electrified rail network</div>
+                </div>
             </div>
         </div>
     </section>
@@ -1004,6 +1002,8 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </section>
 
     <!-- Country Info Panel -->
     <div class="country-info-panel">
@@ -1048,10 +1048,10 @@
             }
         });
 
-        // Load data
+        // Load data and initialize everything
         async function loadData() {
             try {
-                // Simulate data loading for demo
+                // Sample data for demo
                 countryData = [
                     { country: 'Austria', electrification_pct: 74, total_length_clean: 5577, passenger_km_clean: 14019 },
                     { country: 'Belgium', electrification_pct: 88, total_length_clean: 3629, passenger_km_clean: 245 },
@@ -1085,11 +1085,14 @@
                     { country: 'United Kingdom', electrification_pct: 38, total_length_clean: 16433, passenger_km_clean: 16200 }
                 ];
                 
-                // Initialize map after data loads
+                // Initialize map and charts after data loads
                 initializeMap();
+                initializeCharts();
                 
             } catch (error) {
                 console.error('Error loading data:', error);
+                // Show error message or fallback content
+                document.getElementById('europe-map').innerHTML = '<div class="loading">Failed to load map data. Please refresh the page.</div>';
             }
         }
 
@@ -1097,6 +1100,9 @@
         function initializeMap() {
             const width = document.getElementById('europe-map').clientWidth;
             const height = 600;
+            
+            // Clear any existing content
+            d3.select('#europe-map').selectAll('*').remove();
             
             const svg = d3.select('#europe-map')
                 .append('svg')
@@ -1134,7 +1140,7 @@
                         .attr('class', 'country')
                         .attr('d', path)
                         .style('fill', d => {
-                            const countryName = d.properties.name;
+                            const countryName = d.properties.NAME || d.properties.name;
                             const data = dataMap.get(countryName);
                             return data ? colorScale(data.electrification_pct) : '#e8f5e9';
                         })
@@ -1145,17 +1151,28 @@
                         .on('click', function(event, d) {
                             showCountryDetails(d);
                         });
+                })
+                .catch(function(error) {
+                    console.error('Error loading map data:', error);
+                    svg.append('text')
+                        .attr('x', width / 2)
+                        .attr('y', height / 2)
+                        .attr('text-anchor', 'middle')
+                        .style('font-size', '18px')
+                        .style('fill', '#4a7c59')
+                        .text('Map data temporarily unavailable');
                 });
         }
 
         // Tooltip functions
         function showTooltip(event, data) {
             const tooltip = document.querySelector('.tooltip');
-            const countryInfo = countryData.find(c => c.country === data.properties.name);
+            const countryName = data.properties.NAME || data.properties.name;
+            const countryInfo = countryData.find(c => c.country === countryName);
             
             if (countryInfo) {
                 tooltip.innerHTML = `
-                    <strong>${data.properties.name}</strong><br>
+                    <strong>${countryName}</strong><br>
                     Electrification: ${countryInfo.electrification_pct}%<br>
                     Network: ${countryInfo.total_length_clean.toLocaleString()} km<br>
                     Passengers: ${countryInfo.passenger_km_clean.toLocaleString()}M km
@@ -1174,7 +1191,8 @@
         function showCountryDetails(countryFeature) {
             const panel = document.querySelector('.country-info-panel');
             const details = document.getElementById('country-details');
-            const countryInfo = countryData.find(c => c.country === countryFeature.properties.name);
+            const countryName = countryFeature.properties.NAME || countryFeature.properties.name;
+            const countryInfo = countryData.find(c => c.country === countryName);
             
             if (countryInfo) {
                 details.innerHTML = `
@@ -1202,6 +1220,7 @@
             document.querySelector('.country-info-panel').classList.remove('active');
         }
 
+        // Initialize all charts
         function initializeCharts() {
             // Speed vs Price Scatter Chart
             const speedPriceCtx = document.getElementById('speedPriceChart').getContext('2d');
@@ -1211,11 +1230,11 @@
                     datasets: [{
                         label: 'High-Speed Rail',
                         data: [
-                            {x: 274, y: 0.12, label: 'Paris-Bordeaux'},
-                            {x: 248, y: 0.14, label: 'Madrid-Barcelona'},
-                            {x: 239, y: 0.14, label: 'Paris-Lyon'},
-                            {x: 217, y: 0.18, label: 'London-Paris'},
-                            {x: 195, y: 0.10, label: 'Milan-Rome'}
+                            {x: 274, y: 0.12},
+                            {x: 248, y: 0.14},
+                            {x: 239, y: 0.14},
+                            {x: 217, y: 0.18},
+                            {x: 195, y: 0.10}
                         ],
                         backgroundColor: 'rgba(45, 159, 93, 0.6)',
                         borderColor: '#2d9f5d',
@@ -1225,25 +1244,13 @@
                     }, {
                         label: 'Conventional Rail',
                         data: [
-                            {x: 159, y: 0.08, label: 'Berlin-Munich'},
-                            {x: 120, y: 0.06, label: 'Vienna-Salzburg'},
-                            {x: 93, y: 0.20, label: 'Amsterdam-Brussels'},
-                            {x: 80, y: 0.04, label: 'Prague-Budapest'}
+                            {x: 159, y: 0.08},
+                            {x: 120, y: 0.06},
+                            {x: 93, y: 0.20},
+                            {x: 80, y: 0.04}
                         ],
                         backgroundColor: 'rgba(200, 230, 201, 0.6)',
                         borderColor: '#81c784',
-                        borderWidth: 2,
-                        pointRadius: 8,
-                        pointHoverRadius: 10
-                    }, {
-                        label: 'Budget Rail',
-                        data: [
-                            {x: 120, y: 0.01, label: 'Berlin-Cologne'},
-                            {x: 90, y: 0.03, label: 'Prague-Vienna'},
-                            {x: 85, y: 0.04, label: 'Warsaw-Krakow'}
-                        ],
-                        backgroundColor: 'rgba(255, 193, 7, 0.6)',
-                        borderColor: '#ffa000',
                         borderWidth: 2,
                         pointRadius: 8,
                         pointHoverRadius: 10
@@ -1255,13 +1262,6 @@
                     plugins: {
                         title: {
                             display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.raw.label + ': ' + context.parsed.x + ' km/h, €' + context.parsed.y + '/km';
-                                }
-                            }
                         }
                     },
                     scales: {
@@ -1331,7 +1331,7 @@
 
             // Country Radar Chart
             const countryRadarCtx = document.getElementById('countryRadarChart').getContext('2d');
-            window.countryRadarChart = new Chart(countryRadarCtx, {
+            new Chart(countryRadarCtx, {
                 type: 'radar',
                 data: {
                     labels: ['Electrification %', 'Avg Speed', 'Punctuality', 'Network Size', 'Price/km'],
@@ -1372,17 +1372,17 @@
                 }
             });
 
-            // Electrification Chart
+            // Electrification Doughnut Chart
             const electrificationCtx = document.getElementById('electrificationChart').getContext('2d');
             new Chart(electrificationCtx, {
-                type: 'bar',
+                type: 'doughnut',
                 data: {
-                    labels: ['Switzerland', 'Netherlands', 'Belgium', 'Sweden', 'Austria', 'Italy', 'Germany', 'France', 'Spain', 'UK'],
+                    labels: ['Switzerland', 'Luxembourg', 'Belgium', 'Sweden', 'Netherlands', 'Austria', 'Italy', 'Portugal', 'Spain', 'Others'],
                     datasets: [{
-                        data: [100, 100, 86, 75, 73, 72, 61, 59, 55, 42],
+                        data: [100, 97, 88, 75, 75, 74, 73, 71, 67, 45],
                         backgroundColor: [
-                            '#1a5a3a', '#2d9f5d', '#4ac77d', '#66bb6a', '#81c784',
-                            '#a5d6a7', '#c8e6c9', '#e8f5e9', '#f1f8e9', '#f9fbe7'
+                            '#1a5a3a', '#2d4c2a', '#2d9f5d', '#4ac77d', '#66bb6a', 
+                            '#81c784', '#a5d6a7', '#c8e6c9', '#e8f5e9', '#f1f8e9'
                         ],
                         borderWidth: 2,
                         borderColor: '#fff'
@@ -1410,131 +1410,21 @@
                     }
                 }
             });
-
-            // Time vs Distance Chart
-            const timeDistanceCtx = document.getElementById('timeDistanceChart').getContext('2d');
-            new Chart(timeDistanceCtx, {
-                type: 'bubble',
-                data: {
-                    datasets: [{
-                        label: 'High-Speed Rail',
-                        data: [
-                            {x: 466, y: 117, r: 15, label: 'Paris-Lyon'},
-                            {x: 621, y: 150, r: 15, label: 'Madrid-Barcelona'},
-                            {x: 515, y: 120, r: 15, label: 'Paris-Bordeaux'},
-                            {x: 568, y: 175, r: 15, label: 'Milan-Rome'}
-                        ],
-                        backgroundColor: 'rgba(45, 159, 93, 0.6)',
-                        borderColor: '#2d9f5d'
-                    }, {
-                        label: 'Conventional',
-                        data: [
-                            {x: 623, y: 235, r: 12, label: 'Berlin-Munich'},
-                            {x: 173, y: 112, r: 12, label: 'Amsterdam-Brussels'},
-                            {x: 305, y: 180, r: 12, label: 'Vienna-Salzburg'}
-                        ],
-                        backgroundColor: 'rgba(255, 193, 7, 0.6)',
-                        borderColor: '#ffa000'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Distance (km)',
-                                color: '#4a7c59',
-                                font: { size: 14, weight: 'bold' }
-                            },
-                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Journey Time (minutes)',
-                                color: '#4a7c59',
-                                font: { size: 14, weight: 'bold' }
-                            },
-                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.raw.label + ': ' + context.parsed.x + ' km in ' + 
-                                           Math.floor(context.parsed.y / 60) + 'h ' + (context.parsed.y % 60) + 'm';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Price vs Distance Chart
-            const priceDistanceCtx = document.getElementById('priceDistanceChart').getContext('2d');
-            new Chart(priceDistanceCtx, {
-                type: 'line',
-                data: {
-                    labels: ['100km', '200km', '300km', '400km', '500km', '600km', '700km', '800km'],
-                    datasets: [{
-                        label: 'Premium (TGV/ICE)',
-                        data: [25, 45, 65, 85, 105, 125, 145, 165],
-                        borderColor: '#2d9f5d',
-                        backgroundColor: 'rgba(45, 159, 93, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4
-                    }, {
-                        label: 'Standard',
-                        data: [15, 28, 40, 52, 65, 78, 90, 102],
-                        borderColor: '#ffa000',
-                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4
-                    }, {
-                        label: 'Budget',
-                        data: [9, 15, 22, 29, 35, 42, 49, 55],
-                        borderColor: '#f44336',
-                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Distance',
-                                color: '#4a7c59',
-                                font: { size: 14, weight: 'bold' }
-                            },
-                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Average Price (€)',
-                                color: '#4a7c59',
-                                font: { size: 14, weight: 'bold' }
-                            },
-                            grid: { color: 'rgba(200, 230, 201, 0.2)' }
-                        }
-                    }
-                }
-            });
         }
-    // Initialize on load
-    window.addEventListener('load', loadData);
+
+        // Initialize everything when the page loads
+        window.addEventListener('load', function() {
+            console.log('Page loaded, initializing...');
+            loadData();
+        });
+        
+        // Fallback initialization after a short delay
+        setTimeout(function() {
+            if (!countryData.length) {
+                console.log('Fallback initialization...');
+                loadData();
+            }
+        }, 1000);
     </script>
-    
 </body>
 </html>
