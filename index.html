@@ -1096,7 +1096,7 @@
             }
         }
 
-        // Initialize map
+       // Initialize map
         function initializeMap() {
             const width = document.getElementById('europe-map').clientWidth;
             const height = 600;
@@ -1140,9 +1140,32 @@
                         .attr('class', 'country')
                         .attr('d', path)
                         .style('fill', d => {
-                            const countryName = d.properties.NAME || d.properties.name;
-                            const data = dataMap.get(countryName);
-                            return data ? colorScale(data.electrification_pct) : '#e8f5e9';
+                            // Try multiple property names for country matching
+                            const possibleNames = [
+                                d.properties.NAME,
+                                d.properties.name, 
+                                d.properties.NAME_EN,
+                                d.properties.ADMIN,
+                                d.properties.sovereignt
+                            ].filter(name => name);
+                            
+                            let countryInfo = null;
+                            for (let name of possibleNames) {
+                                countryInfo = dataMap.get(name) || 
+                                            dataMap.get(countryNameMap[name]);
+                                if (countryInfo) break;
+                                
+                                // Try partial matches
+                                for (let [key, value] of dataMap) {
+                                    if (name.includes(key) || key.includes(name)) {
+                                        countryInfo = value;
+                                        break;
+                                    }
+                                }
+                                if (countryInfo) break;
+                            }
+                            
+                            return countryInfo ? colorScale(countryInfo.electrification_pct) : '#f5f5f5';
                         })
                         .on('mouseover', function(event, d) {
                             showTooltip(event, d);
@@ -1164,18 +1187,91 @@
                 });
         }
 
+        // Country name mapping for different data sources
+        const countryNameMap = {
+            'Germany': 'Germany',
+            'France': 'France', 
+            'Spain': 'Spain',
+            'Italy': 'Italy',
+            'Poland': 'Poland',
+            'United Kingdom': 'United Kingdom',
+            'Romania': 'Romania',
+            'Greece': 'Greece',
+            'Bulgaria': 'Bulgaria',
+            'Hungary': 'Hungary',
+            'Portugal': 'Portugal',
+            'Austria': 'Austria',
+            'Czech Republic': 'Czech Republic',
+            'Serbia': 'Serbia',
+            'Ireland': 'Ireland',
+            'Lithuania': 'Lithuania',
+            'Latvia': 'Latvia',
+            'Croatia': 'Croatia',
+            'Bosnia and Herzegovina': 'Bosnia and Herzegovina',
+            'Slovakia': 'Slovakia',
+            'Estonia': 'Estonia',
+            'Denmark': 'Denmark',
+            'Netherlands': 'Netherlands',
+            'Switzerland': 'Switzerland',
+            'Belgium': 'Belgium',
+            'Slovenia': 'Slovenia',
+            'North Macedonia': 'North Macedonia',
+            'Albania': 'Albania',
+            'Norway': 'Norway',
+            'Sweden': 'Sweden',
+            'Finland': 'Finland',
+            'Luxembourg': 'Luxembourg',
+            'Turkey': 'Turkey'
+        };
+
         // Tooltip functions
         function showTooltip(event, data) {
             const tooltip = document.querySelector('.tooltip');
-            const countryName = data.properties.NAME || data.properties.name;
-            const countryInfo = countryData.find(c => c.country === countryName);
+            // Try multiple property names that might contain the country name
+            const possibleNames = [
+                data.properties.NAME,
+                data.properties.name, 
+                data.properties.NAME_EN,
+                data.properties.ADMIN,
+                data.properties.sovereignt
+            ].filter(name => name); // Remove undefined values
+            
+            console.log('Country properties:', data.properties); // Debug log
+            console.log('Possible names:', possibleNames); // Debug log
+            
+            let countryInfo = null;
+            let matchedName = null;
+            
+            // Try to find a match with any of the possible names
+            for (let name of possibleNames) {
+                countryInfo = countryData.find(c => 
+                    c.country === name || 
+                    c.country === countryNameMap[name] ||
+                    name.includes(c.country) ||
+                    c.country.includes(name)
+                );
+                if (countryInfo) {
+                    matchedName = name;
+                    break;
+                }
+            }
             
             if (countryInfo) {
                 tooltip.innerHTML = `
-                    <strong>${countryName}</strong><br>
+                    <strong>${matchedName}</strong><br>
                     Electrification: ${countryInfo.electrification_pct}%<br>
                     Network: ${countryInfo.total_length_clean.toLocaleString()} km<br>
                     Passengers: ${countryInfo.passenger_km_clean.toLocaleString()}M km
+                `;
+                tooltip.style.left = event.pageX + 10 + 'px';
+                tooltip.style.top = event.pageY - 10 + 'px';
+                tooltip.classList.add('active');
+            } else {
+                // Show debug tooltip even when no data found
+                tooltip.innerHTML = `
+                    <strong>${possibleNames[0] || 'Unknown'}</strong><br>
+                    <em>No railway data available</em><br>
+                    <small>Debug: ${JSON.stringify(possibleNames)}</small>
                 `;
                 tooltip.style.left = event.pageX + 10 + 'px';
                 tooltip.style.top = event.pageY - 10 + 'px';
@@ -1191,8 +1287,32 @@
         function showCountryDetails(countryFeature) {
             const panel = document.querySelector('.country-info-panel');
             const details = document.getElementById('country-details');
-            const countryName = countryFeature.properties.NAME || countryFeature.properties.name;
-            const countryInfo = countryData.find(c => c.country === countryName);
+            
+            // Try multiple property names
+            const possibleNames = [
+                countryFeature.properties.NAME,
+                countryFeature.properties.name, 
+                countryFeature.properties.NAME_EN,
+                countryFeature.properties.ADMIN,
+                countryFeature.properties.sovereignt
+            ].filter(name => name);
+            
+            let countryInfo = null;
+            let matchedName = null;
+            
+            // Try to find a match
+            for (let name of possibleNames) {
+                countryInfo = countryData.find(c => 
+                    c.country === name || 
+                    c.country === countryNameMap[name] ||
+                    name.includes(c.country) ||
+                    c.country.includes(name)
+                );
+                if (countryInfo) {
+                    matchedName = name;
+                    break;
+                }
+            }
             
             if (countryInfo) {
                 details.innerHTML = `
@@ -1211,6 +1331,15 @@
                             <div class="extreme-label">Million passenger-km</div>
                         </div>
                     </div>
+                `;
+                panel.classList.add('active');
+            } else {
+                details.innerHTML = `
+                    <h2 style="color: #1a5a3a; margin-bottom: 2rem;">${possibleNames[0] || 'Unknown Country'}</h2>
+                    <p style="color: #4a7c59;">No railway data available for this country.</p>
+                    <p style="color: #6b8e6b; font-size: 0.9rem; margin-top: 1rem;">
+                        Available names: ${possibleNames.join(', ')}
+                    </p>
                 `;
                 panel.classList.add('active');
             }
