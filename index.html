@@ -342,66 +342,87 @@
         const ukOperators = ['ScotRail', 'Northern', 'CrossCountry', 'GWR', 'Avanti West Coast', 'Eurostar'];
         const ukScores = [6.8, 6.5, 6.2, 5.9, 5.7, 5.2];
 
-        // Chart color scheme
+        // Chart color scheme - All green variants
         const primaryColor = '#2d9f5d';
         const secondaryColor = '#1a5a3a';
-        const accentColor = '#ffffff';
+        const lightGreen = '#52c785';
+        const darkGreen = '#0f3a23';
 
-        // EU Service Chart
-        new Chart(document.getElementById('euServiceChart'), {
-            type: 'bar',
-            data: {
-                labels: euOperators,
-                datasets: [{
-                    data: euScores,
-                    backgroundColor: primaryColor,
-                    borderColor: secondaryColor,
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 10,
-                        title: { display: true, text: 'Service Score' }
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // EU Service Chart
+            const euCtx = document.getElementById('euServiceChart');
+            if (euCtx) {
+                new Chart(euCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: euOperators,
+                        datasets: [{
+                            label: 'Service Score',
+                            data: euScores,
+                            backgroundColor: primaryColor,
+                            borderColor: secondaryColor,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10,
+                                title: { display: true, text: 'Service Score' }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45
+                                }
+                            }
+                        }
                     }
-                }
+                });
             }
-        });
 
-        // UK Service Chart
-        new Chart(document.getElementById('ukServiceChart'), {
-            type: 'bar',
-            data: {
-                labels: ukOperators,
-                datasets: [{
-                    data: ukScores,
-                    backgroundColor: '#e74c3c',
-                    borderColor: '#c0392b',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 10,
-                        title: { display: true, text: 'Service Score' }
+            // UK Service Chart
+            const ukCtx = document.getElementById('ukServiceChart');
+            if (ukCtx) {
+                new Chart(ukCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ukOperators,
+                        datasets: [{
+                            label: 'Service Score',
+                            data: ukScores,
+                            backgroundColor: lightGreen,
+                            borderColor: darkGreen,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10,
+                                title: { display: true, text: 'Service Score' }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45
+                                }
+                            }
+                        }
                     }
-                }
+                });
             }
-        });
 
         // Price-Quality Chart
         new Chart(document.getElementById('priceQualityChart'), {
